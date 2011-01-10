@@ -24,8 +24,8 @@
   "bugs": {
     "url": "http://github.com/kitgoncharov/spec/issues"
   },
-  "repositories": [{
+  "repository": {
     "type": "git",
     "url": "http://github.com/kitgoncharov/spec.git"
-  }]
+  }
 }

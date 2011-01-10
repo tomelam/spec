@@ -80,6 +80,7 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 ### Contributors
 
 * [John-David Dalton](http://allyoucanleet.com)
+* [Mathias Bynens](http://mathiasbynens.be)
 
 ## MIT License
 
