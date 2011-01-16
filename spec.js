@@ -134,22 +134,6 @@
     return this;
   };
 
-  // Binds a one-time event handler. The `handler` function is invoked and
-  // immediately removed when the `event` is fired.
-  Spec.Events.prototype.one = function(event, handler) {
-    var target = this, onTrigger;
-    if (event != null && typeof handler == 'function') {
-      // Create and bind a proxy event handler.
-      onTrigger = function() {
-        // Remove the proxy and trigger the original handler.
-        target.unbind(event, onTrigger);
-        handler.apply(this, arguments);
-      };
-      target.bind(event, onTrigger);
-    }
-    return target;
-  };
-
   // Removes a previously-bound event handler. If the `handler` function is
   // omitted, all handlers for the `event` are removed. If both the event and
   // handler are omitted, *all* event handlers are removed.
@@ -268,8 +252,8 @@
       // Triggered at the start of each test.
       onSetup = function(test) {
         // Bind the helper event handlers and trigger the spec's `setup` event.
-        test.bind('assertion', onAssertion).bind('failure', onFailure).bind(
-          'error', onError).one('teardown', onTeardown);
+        test.bind('teardown', onTeardown).bind('assertion', onAssertion).bind(
+          'failure', onFailure).bind('error', onError);
         spec.trigger('setup', test);
       };
       // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
@@ -290,8 +274,8 @@
       // Triggered at the end of each test.
       onTeardown = function(test) {
         // Unbind the helper event handlers.
-        test.unbind('assertion', onAssertion).unbind('failure',
-          onFailure).unbind('error', onError);
+        test.unbind('teardown', onTeardown).unbind('assertion',
+          onAssertion).unbind('failure', onFailure).unbind('error', onError);
         spec.trigger('teardown', test);
         if (++index < length && index in spec) {
           // Run the next test.
