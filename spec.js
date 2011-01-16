@@ -15,12 +15,12 @@
   // Convenience aliases.
   var toString = Object.prototype.toString, slice = Array.prototype.slice,
 
-  // Creates a new **spec**, or collection of related unit tests.
+  // Creates a new spec, or collection of related unit tests.
   Spec = this.Spec = function(name) {
     return new Spec.prototype.constructor(name);
   },
 
-  // **Internal method**; recursively compares two objects.
+  // Internal method; recursively compares two objects.
   eq = function(left, right, stack) {
     // Based on work by Jeremy Ashkenas, Philippe Rathe, and Mark Miller.
     var className, key, size, sizeRight, result;
@@ -33,7 +33,7 @@
       // A strict comparison is necessary because `null == undefined`.
       return left === right;
     }
-    // Compare *[[Class]]* names (see the ECMAScript 5 spec, section 15.2.4.2).
+    // Compare `[[Class]]` names (see the ECMAScript 5 spec, section 15.2.4.2).
     if ((className = toString.call(left)) != toString.call(right)) {
       return false;
     }
@@ -451,7 +451,7 @@
   };
 
   // Completes a test with an optional expected number of `assertions`. This
-  // method **must** be called at the end of a test.
+  // method *must* be called at the end of each test.
   Spec.Test.prototype.done = function(assertions) {
     if (typeof assertions == 'number' && assertions > -1) {
       assertions = Math.ceil(assertions);
