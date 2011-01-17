@@ -26,7 +26,7 @@
     var className, key, size, sizeRight, result;
     // Identical objects and values. `0 === -0`, but they aren't equal.
     if (left === right) {
-      return left !== 0 || 1 / left === 1 / right;
+      return left !== 0 || 1 / left == 1 / right;
     }
     // `null` and `undefined` values.
     if (left == null) {
@@ -47,19 +47,18 @@
         left = left.valueOf();
         right = right.valueOf();
         // `NaN`s are non-reflexive.
-        return left !== left ? right !== right : left === right;
+        return left != left ? right != right : left === right;
       // Compare regular expressions.
       case '[object RegExp]':
-        return left.source === right.source && left.global === right.global &&
-        // The sticky (`y`) flag is Firefox-specific.
-        left.ignoreCase === right.ignoreCase && left.sticky === right.sticky &&
-        left.multiline === right.multiline;
+        return left.source == right.source && left.global == right.global &&
+        left.multiline == right.multiline && left.ignoreCase ==
+        right.ignoreCase;
       // Compare functions.
       case '[object Function]':
-        return left === right;
+        return left == right;
       case '[object Array]':
         // Compare lengths to determine if a deep comparison is necessary.
-        if (left.length !== right.length) {
+        if (left.length != right.length) {
           return false;
         }
     }
@@ -68,7 +67,7 @@
       // Ensure that the object has not already been traversed and compared.
       size = stack.length;
       while (size--) {
-        if (stack[size] === left) {
+        if (stack[size] == left) {
           // Cyclic structure; assume equality.
           return true;
         }
@@ -93,7 +92,7 @@
             break;
           }
         }
-        result = size === sizeRight;
+        result = size == sizeRight;
       }
       // Remove the object from the stack once the deep comparison is complete.
       stack.pop();
@@ -139,19 +138,19 @@
   // handler are omitted, *all* event handlers are removed.
   Spec.Events.prototype.unbind = function(event, handler) {
     var events = this.events, handlers, length;
-    if (event == null && handler === event || !events) {
+    if (event == null && handler == event || !events) {
       // Create or clear the event registry.
       this.events = {};
     } else if (event != null && (handlers = events[event])) {
       // Omitted handler or single-handler event.
       if (handler == null || typeof handlers == 'function' &&
-      handlers === handler) {
+      handlers == handler) {
         delete events[event];
       } else {
         // Remove the handler from the event handler registry.
         length = handlers.length;
         while (length--) {
-          if (handlers[length] === handler) {
+          if (handlers[length] == handler) {
             handlers.splice(length, 1);
           }
         }
@@ -253,7 +252,7 @@
       onSetup = function(test) {
         // Bind the helper event handlers and trigger the spec's `setup` event.
         test.bind('teardown', onTeardown).bind('assertion', onAssertion).bind(
-          'failure', onFailure).bind('error', onError);
+          'failure', onFailure).bind('error', onError).unbind('setup', onSetup);
         spec.trigger('setup', test);
       };
       // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
@@ -287,7 +286,7 @@
         }
       };
       // Bind the `onSetup` event handler and begin running the tests.
-      spec.invoke('one', 'setup', onSetup).trigger('start')[index].run();
+      spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
     }
     return this;
   };
@@ -412,8 +411,8 @@
   Spec.Test.prototype.raises = function(block, expected, message) {
     var ok = false, isFunction = typeof expected == 'function',
     isRegExp = expected && toString.call(expected) == '[object RegExp]';
-    if (!(isFunction || isRegExp) && message == null) {
-      // The message was passed as the second argument.
+    // The message was passed as the second argument.
+    if (!isFunction && !isRegExp && message == null) {
       message = expected;
       expected = null;
     }
@@ -421,9 +420,8 @@
       try {
         block();
       } catch (error) {
-        if (expected == null) {
-          ok = true;
-        } else if (isRegExp) {
+        ok = expected == null;
+        if (isRegExp) {
           ok = expected.test(error);
         } else if (isFunction) {
           // Pass the error as the first argument to the validation function.
@@ -440,7 +438,7 @@
     if (typeof assertions == 'number' && assertions > -1) {
       assertions = Math.ceil(assertions);
       // Verify that the expected number of assertions were executed.
-      if (assertions !== this.assertions) {
+      if (assertions != this.assertions) {
         this.fail(this.assertions, assertions, 'done');
       }
     }
