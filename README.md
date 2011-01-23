@@ -25,7 +25,7 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 - **Naming**: Keep variable and method names concise but descriptive. `index` and `callback` are preferable to `i` and `fn`.
 - **Comments**: Significant changes and new methods should be annotated with single-line comments.
 - **Performance**: Don't overuse abstractions or slow down critical code to add a feature of marginal utility.
-- **Lint**: Make sure your changes pass [JavaScript Lint](http://javascriptlint.com/). A configuration file is included in the repository; run `jsl -conf jsl.conf` from the command line to check the source code for problems.
+- **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). A configuration file is included in the repository; run `jsl -conf jsl.conf` from the command line to check the source code for problems.
 
 ### Contributors
 

@@ -242,9 +242,9 @@
   Spec.prototype.run = function() {
     var spec = this, index, length, onSetup, onAssertion, onFailure,
     onError, onTeardown;
-    if (!spec.isRunning) {
+    if (!spec.active) {
       // Avoid race conditions caused by multiple invocations.
-      spec.isRunning = true;
+      spec.active = true;
       // Create the aggregate spec summary.
       index = spec.assertions = spec.failures = spec.errors = 0;
       length = spec.length;
@@ -281,7 +281,7 @@
           spec[index].run();
         } else {
           // Finish running the spec.
-          spec.isRunning = false;
+          spec.active = false;
           spec.trigger('complete');
         }
       };
@@ -312,8 +312,9 @@
   // Runs the test.
   Spec.Test.prototype.run = function() {
     var ok;
-    if (!this.isRunning) {
-      this.isRunning = true;
+    if (!this.active) {
+      // Avoid race conditions.
+      this.active = true;
       this.assertions = this.failures = this.errors = 0;
       this.trigger('setup');
       try {
@@ -339,23 +340,30 @@
   // properties: `actual` is the actual value passed to the assertion,
   // `expected` is the expected value, and `message` is the assertion message.
   Spec.Test.prototype.assert = function(actual, expected, message) {
-    this.assertions++;
-    return this.trigger('assertion', {
-      'actual': actual,
-      'expected': expected,
-      'message': message
-    });
+    // Only record the assertion if the test is running.
+    if (this.active) {
+      this.assertions++;
+      this.trigger('assertion', {
+        'actual': actual,
+        'expected': expected,
+        'message': message
+      });
+    }
+    return this;
   };
 
   // The opposite of `.assert()`; records a failure and triggers the `failure`
   // event.
   Spec.Test.prototype.fail = function(actual, expected, message) {
-    this.failures++;
-    return this.trigger('failure', {
-      'actual': actual,
-      'expected': expected,
-      'message': message
-    });
+    // Only record the failure if the test is running.
+    if (this.active) {
+      this.failures++;
+      return this.trigger('failure', {
+        'actual': actual,
+        'expected': expected,
+        'message': message
+      });
+    }
   };
 
   // Tests whether `value` is truthy. To test strictly for the boolean `true`,
@@ -435,14 +443,18 @@
   // Completes a test with an optional expected number of `assertions`. This
   // method *must* be called at the end of each test.
   Spec.Test.prototype.done = function(assertions) {
-    if (typeof assertions == 'number' && assertions > -1) {
-      assertions = Math.ceil(assertions);
-      // Verify that the expected number of assertions were executed.
-      if (assertions != this.assertions) {
-        this.fail(this.assertions, assertions, 'done');
+    if (this.active) {
+      // Avoid race conditions.
+      this.active = false;
+      if (typeof assertions == 'number' && assertions > -1) {
+        assertions = Math.ceil(assertions);
+        // Verify that the expected number of assertions were executed.
+        if (assertions != this.assertions) {
+          this.fail(this.assertions, assertions, 'done');
+        }
       }
+      this.trigger('teardown');
     }
-    this.isRunning = false;
-    return this.trigger('teardown');
+    return this;
   };
 }).call(typeof exports == 'object' && exports || this);
