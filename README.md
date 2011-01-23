@@ -7,6 +7,18 @@ Spec is environment and framework-agnostic: it has no external dependencies, and
 
 The [annotated source code](http://kitgoncharov.github.com/spec/docs/spec.html) and [example spec](http://kitgoncharov.github.com/spec/examples/spec.html) are available for your perusal.
 
+## Installation
+
+**Latest Version**: [0.9.9](http://kitgoncharov.github.com/spec/spec.js)
+
+To use Spec in a web browser, download the latest version and include it in an HTML file for displaying the test results:
+
+    <script type="text/javascript" src="/path/to/spec.js"></script>
+
+You can also install the latest version of Spec via [npm](http://npmjs.org), the [Node](http://nodejs.org) Package Manager:
+
+    $ npm install spec
+
 ## Contributing to Spec
 
 Check out a working copy of the Spec source code with [Git](http://git-scm.com/):
