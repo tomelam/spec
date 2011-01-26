@@ -2,12 +2,12 @@
   "name": "spec",
   "version": "0.9.9",
   "description": "An event-driven JavaScript unit testing library.",
-  "homepage": "http://github.com/kitgoncharov/spec",
+  "homepage": "http://github.com/kitgoncharov/Spec",
   "main": "spec",
   "keywords": ["unit", "test", "testing", "event", "spec", "suite", "assert"],
   "licenses": [{
     "type": "MIT",
-    "url": "http://kitgoncharov.github.com/spec/LICENSE"
+    "url": "http://kitgoncharov.github.com/Spec/LICENSE"
   }],
   "author": {
     "name": "Kit Goncharov",
@@ -22,10 +22,10 @@
     "web": "http://allyoucanleet.com"
   }],
   "bugs": {
-    "url": "http://github.com/kitgoncharov/spec/issues"
+    "url": "http://github.com/kitgoncharov/Spec/issues"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/kitgoncharov/spec.git"
+    "url": "http://github.com/kitgoncharov/Spec.git"
   }
 }
