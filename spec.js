@@ -1,6 +1,6 @@
 /*!
  * Spec unit testing library
- * http://github.com/kitgoncharov/spec
+ * http://github.com/kitgoncharov/Spec
  *
  * Copyright 2011, Kit Goncharov
  * http://kitgoncharov.github.com
@@ -106,7 +106,7 @@
 
   // Custom Events
   // -------------
-  
+
   // Methods for adding, removing, and firing custom events. You can `bind` and
   // `unbind` event handlers; `trigger`-ing an event executes its handlers in
   // succession.
