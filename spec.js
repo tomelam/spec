@@ -106,28 +106,29 @@
 
   // Custom Events
   // -------------
-
-  // `Spec.Events` is module that provides methods for adding, removing, and
-  // firing custom events. You can `bind` or `unbind` event handlers;
-  // `trigger`ing an event executes its handlers in succession. All specs and
-  // tests inherit from this module.
-  Spec.Events = function() {};
+  
+  // Methods for adding, removing, and firing custom events. You can `bind` and
+  // `unbind` event handlers; `trigger`-ing an event executes its handlers in
+  // succession.
+  Spec.Events = function() {
+    this.events = {};
+  };
 
   // Binds an event handler. The `handler` function will be invoked each time
   // the `event`, specified by a string identifier, is fired.
   Spec.Events.prototype.bind = function(event, handler) {
     // Create the event registry if it doesn't exist.
-    var events = this.events || (this.events = {}), handlers;
+    var handlers;
     if (event != null && typeof handler == 'function') {
-      if (!(handlers = events[event])) {
+      if (!(handlers = this.events[event])) {
         // Single-handler event; avoid creating a handler registry.
-        events[event] = handler;
+        this.events[event] = handler;
       } else if (handlers && typeof handlers.push == 'function') {
         // Multiple-handler event; add the handler to the registry.
         handlers.push(handler);
       } else {
         // Convert a single-handler event into a multiple-handler event.
-        events[event] = [handlers, handler];
+        this.events[event] = [handlers, handler];
       }
     }
     return this;
@@ -137,15 +138,15 @@
   // omitted, all handlers for the `event` are removed. If both the event and
   // handler are omitted, *all* event handlers are removed.
   Spec.Events.prototype.unbind = function(event, handler) {
-    var events = this.events, handlers, length;
-    if (event == null && handler == event || !events) {
-      // Create or clear the event registry.
+    var handlers, length;
+    if (event == null && handler == null) {
+      // Clear the event registry.
       this.events = {};
-    } else if (event != null && (handlers = events[event])) {
+    } else if (event != null && (handlers = this.events[event])) {
       // Omitted handler or single-handler event.
       if (handler == null || typeof handlers == 'function' &&
       handlers == handler) {
-        delete events[event];
+        delete this.events[event];
       } else {
         // Remove the handler from the event handler registry.
         length = handlers.length;
@@ -156,7 +157,7 @@
         }
         // Remove empty handler registries.
         if (!handlers.length) {
-          delete events[event];
+          delete this.events[event];
         }
       }
     }
@@ -166,8 +167,8 @@
   // Triggers an event, firing all bound event handlers. Subsequent arguments
   // are passed to each handler.
   Spec.Events.prototype.trigger = function(event) {
-    var events = this.events, handlers, handler, index, length, parameters;
-    if (event != null && events && (handlers = events[event])) {
+    var handlers, handler, index, length, parameters;
+    if (event != null && this.events && (handlers = this.events[event])) {
       if (typeof handlers == 'function') {
         // Optimize for 3 or fewer arguments. Based on work by Jeremy Martin.
         switch (arguments.length) {
@@ -210,11 +211,12 @@
   // Specs
   // -----
 
-  // Mix in the custom events module.
+  // Add support for custom events.
   Spec.prototype = new Spec.Events();
 
   // Creates a new spec. The `name` is optional.
   (Spec.prototype.constructor = function(name) {
+    Spec.Events.call(this);
     this.name = name != null ? name : 'Anonymous Spec';
     this.length = 0;
   }).prototype = Spec.prototype;
@@ -256,14 +258,14 @@
         spec.trigger('setup', test);
       };
       // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
-      onAssertion = function(assertion, test) {
+      onAssertion = function(data, test) {
         spec.assertions++;
-        spec.trigger('assertion', assertion, test);
+        spec.trigger('assertion', data, test);
       };
       // Triggered when an assertion fails.
-      onFailure = function(failure, test) {
+      onFailure = function(data, test) {
         spec.failures++;
-        spec.trigger('failure', failure, test);
+        spec.trigger('failure', data, test);
       };
       // Triggered when a test throws an error.
       onError = function(error, test) {
@@ -305,11 +307,12 @@
       test = name;
       name = null;
     }
+    Spec.Events.call(this);
     this.name = name != null ? name : 'Anonymous Test';
     this.test = typeof test == 'function' ? test : null;
   };
 
-  // Mix in the custom events module.
+  // Add support for custom events.
   Spec.Test.prototype = new Spec.Events();
   Spec.Test.prototype.constructor = Spec.Test;
 
