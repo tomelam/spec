@@ -286,9 +286,13 @@
         }
       };
       // Bind the `onSetup` event handler and begin running the tests.
-      spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
+      try {
+        spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
+      } catch (error) {
+        spec.trigger('error', error);
+      }
     }
-    return this;
+    return spec;
   };
 
   // Tests

@@ -23,7 +23,7 @@ You can also install the latest version of Spec via [npm](http://npmjs.org), the
 
 Check out a working copy of the Spec source code with [Git](http://git-scm.com/):
 
-    $ git clone git://github.com/kitgoncharov/spec.git
+    $ git clone git://github.com/kitgoncharov/Spec.git
 
 If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario.
 
