@@ -25,18 +25,11 @@
     // Based on work by Jeremy Ashkenas, Philippe Rathe, and Mark Miller.
     var className, key, size, sizeRight, result;
     // Identical objects and values. `0 === -0`, but they aren't equal.
-    if (left === right) {
-      return left !== 0 || 1 / left == 1 / right;
-    }
-    // `null` and `undefined` values.
-    if (left == null) {
-      // A strict comparison is necessary because `null == undefined`.
-      return left === right;
-    }
+    if (left === right) return left !== 0 || 1 / left == 1 / right;
+    // A strict comparison is necessary because `null == undefined`.
+    if (left == null) return left === right;
     // Compare `[[Class]]` names (see the ECMAScript 5 spec, section 15.2.4.2).
-    if ((className = toString.call(left)) != toString.call(right)) {
-      return false;
-    }
+    if ((className = toString.call(left)) != toString.call(right)) return false;
     switch (className) {
       // Compare strings, numbers, dates, and booleans by value.
       case '[object String]':
@@ -50,28 +43,20 @@
         return left != left ? right != right : left === right;
       // Compare regular expressions.
       case '[object RegExp]':
-        return left.source == right.source && left.global == right.global &&
-        left.multiline == right.multiline && left.ignoreCase ==
-        right.ignoreCase;
+        return left.source == right.source && left.global == right.global && left.multiline == right.multiline && left.ignoreCase == right.ignoreCase;
       // Compare functions.
       case '[object Function]':
         return left == right;
       case '[object Array]':
         // Compare lengths to determine if a deep comparison is necessary.
-        if (left.length != right.length) {
-          return false;
-        }
+        if (left.length != right.length) return false;
     }
     // Recursively compare objects and arrays.
     if (typeof left == 'object') {
       // Ensure that the object has not already been traversed and compared.
       size = stack.length;
-      while (size--) {
-        if (stack[size] == left) {
-          // Cyclic structure; assume equality.
-          return true;
-        }
-      }
+      // Assume equality for cyclic structures.
+      while (size--) if (stack[size] == left) return true;
       // Add the object to the stack of traversed objects.
       stack.push(left);
       result = true;
@@ -80,17 +65,13 @@
         // Count the expected number of properties.
         size++;
         // Deep compare each member.
-        if (!(result = key in right && eq(left[key], right[key], stack))) {
-          break;
-        }
+        if (!(result = key in right && eq(left[key], right[key], stack))) break;
       }
       // Ensure that the objects have the same number of properties.
       if (result) {
         for (key in right) {
-          if (++sizeRight > size) {
-            // Break as soon as the expected number of properties is greater.
-            break;
-          }
+          // Break as soon as the expected number of properties is greater.
+          if (++sizeRight > size) break;
         }
         result = size == sizeRight;
       }
@@ -150,15 +131,9 @@
       } else {
         // Remove the handler from the event handler registry.
         length = handlers.length;
-        while (length--) {
-          if (handlers[length] == handler) {
-            handlers.splice(length, 1);
-          }
-        }
+        while (length--) if (handlers[length] == handler) handlers.splice(length, 1);
         // Remove empty handler registries.
-        if (!handlers.length) {
-          delete this.events[event];
-        }
+        if (!handlers.length) delete this.events[event];
       }
     }
     return this;
@@ -187,9 +162,7 @@
             handlers.apply(this, parameters);
         }
       } else {
-        if (arguments.length > 1) {
-          (parameters = slice.call(arguments, 1)).push(this);
-        }
+        if (arguments.length > 1) (parameters = slice.call(arguments, 1)).push(this);
         // Clone the handler registry before executing any handlers.
         handlers = slice.call(handlers, 0);
         for (index = 0, length = handlers.length; index < length; index++) {
@@ -233,9 +206,7 @@
     var parameters = slice.call(arguments, 1), index, length, test, method;
     for (index = 0, length = this.length; index < length; index++) {
       test = index in this && this[index];
-      if (test && typeof (method = test[name]) == 'function') {
-        method.apply(test, parameters);
-      }
+      if (test && typeof (method = test[name]) == 'function') method.apply(test, parameters);
     }
     return this;
   };
@@ -435,13 +406,8 @@
     if (this.active) {
       // Avoid race conditions.
       this.active = false;
-      if (typeof assertions == 'number' && assertions > -1) {
-        assertions = Math.ceil(assertions);
-        // Verify that the expected number of assertions were executed.
-        if (assertions != this.assertions) {
-          this.fail(this.assertions, assertions, 'done');
-        }
-      }
+      // Verify that the expected number of assertions were executed.
+      if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
       this.trigger('teardown');
     }
     return this;

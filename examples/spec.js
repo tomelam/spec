@@ -1,12 +1,10 @@
 (function() {
 
   // Create a new spec.
-  var spec = Spec('Miniatures Unit Tests'), undef, escapable, escapes, quote,
-  serialize, stringify = typeof JSON == 'object' && JSON && JSON.stringify,
-  toString = Object.prototype.toString;
+  var spec = Spec('Miniatures Unit Tests'), escapable, escapes, quote, serialize, stringify = typeof JSON == 'object' && JSON && JSON.stringify, toString = Object.prototype.toString;
 
   // ECMAScript 5-compliant `JSON.stringify` fallback.
-  if (typeof stringify != 'function' || stringify(undef) !== undef) {
+  if (typeof stringify != 'function' || stringify(void 0) !== void 0) {
     // Matches control characters, double quotes, and the escape character.
     escapable = /[\x00-\x1f"\\]/g;
     // A hash of escape sequences for control characters.
@@ -24,7 +22,7 @@
       var result = '"', index, lastIndex = escapable.lastIndex = 0, match;
       value = '' + value;
       // Walk the input string.
-      while ((match = escapable.exec(value))) {
+      while (match = escapable.exec(value)) {
         index = match.index;
         match = match[0];
         // Append all characters before the control character.
@@ -32,24 +30,19 @@
         // Update the RegExp's `lastIndex` property.
         lastIndex = escapable.lastIndex = index + match.length;
         // Append and cache the escape sequence.
-        result += escapes[match] || (escapes[match] = ('\\u' + ('0000' +
-          match.charCodeAt(0).toString(16)).slice(-4)));
+        result += escapes[match] || (escapes[match] = ('\\u' + ('0000' + match.charCodeAt(0).toString(16)).slice(-4)));
       }
       // Append the remainder of the input string.
-      if (lastIndex < value.length) {
-        result += value.slice(lastIndex);
-      }
+      if (lastIndex < value.length) result += value.slice(lastIndex);
       return result + '"';
     };
     // Recursively serializes an object. Based on work by Tobie Langel.
     serialize = function(key, value, stack) {
-      var type, className, length, results, member, month, date, hours, minutes,
-      seconds;
+      var type, className, length, results, member, month, date, hours, minutes, seconds;
       value = value[key];
       if (typeof value == 'object') {
         // Fallback for environments that don't implement `Date#toJSON`.
-        if (toString.call(value) == '[object Date]' && !('toJSON' in value) &&
-        typeof value.toJSON != 'function') {
+        if (toString.call(value) == '[object Date]' && !('toJSON' in value) && typeof value.toJSON != 'function') {
           if (isFinite(+value)) {
             // Use `Date#toISOString` if available.
             if (typeof value.toISOString == 'function') {
@@ -61,14 +54,8 @@
               hours = value.getUTCHours();
               minutes = value.getUTCMinutes();
               seconds = value.getUTCSeconds();
-              // Months, dates, hours, minutes, seconds should have 2 digits.
-              value = value.getUTCFullYear() + '-' + (month < 10 ? '0' + month :
-                month) + '-' + (date < 10 ? '0' + date : date) + 'T' + (hours <
-                10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' +
-                minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds :
-                seconds) + '.' + ('000' +
-                // Milliseconds should have three digits.
-                value.getUTCMilliseconds()).slice(-3) + 'Z';
+              // Months, dates, hours, minutes, and seconds should have two digits; milliseconds should have three digits.
+              value = value.getUTCFullYear() + '-' + (month < 10 ? '0' + month : month) + '-' + (date < 10 ? '0' + date : date) + 'T' + (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds) + '.' + ('000' + value.getUTCMilliseconds()).slice(-3) + 'Z';
             }
           } else {
             value = null;
@@ -81,15 +68,10 @@
       // Get the object's internal [[Class]] name.
       className = value != null && toString.call(value);
       // Convert numbers, strings, and booleans to primitives.
-      if (className == '[object Number]' || className == '[object String]' ||
-      className == '[object Boolean]') {
-        value = value.valueOf();
-      }
+      if (className == '[object Number]' || className == '[object String]' || className == '[object Boolean]') value = value.valueOf();
       type = typeof value;
       // Serialize `Infinity`, `NaN`, and `null` values as `"null"`.
-      if (type == 'number' && !isFinite(value) || value === null) {
-        return 'null';
-      }
+      if (type == 'number' && !isFinite(value) || value === null) return 'null';
       switch (type) {
         // `true`, `false`, and numbers are represented as such.
         case 'boolean':
@@ -103,11 +85,7 @@
         case 'object':
           // Ensure that the object is not a cyclic structure.
           length = stack.length;
-          while (length--) {
-            if (stack[length] == value) {
-              throw new TypeError('Cyclic structure.');
-            }
-          }
+          while (length--) if (stack[length] == value) throw new TypeError('Cyclic structure.');
           // Add the object to the stack of serialized objects.
           stack.push(value);
           results = [];
@@ -116,16 +94,14 @@
             while (length--) {
               // Serialize each member.
               member = serialize(length, value, stack);
-              results[length] = member === undef ? 'null' : member;
+              results[length] = member === void 0 ? 'null' : member;
             }
             results = '[' + results.join(',') + ']';
           } else {
             for (length in value) {
               member = serialize(length, value, stack);
-              if (member !== undef) {
-                // Skip members that can't be serialized.
-                results.push(quote(length) + ':' + member);
-              }
+              // Skip members that can't be serialized.
+              if (member !== void 0) results.push(quote(length) + ':' + member);
             }
             results = '{' + results.join(',') + '}';
           }
@@ -159,21 +135,18 @@
 
   spec.bind('failure', function(data) {
     // `failure` is triggered when an assertion fails.
-    console.log('Failure: ' + data.message + '. Expected: ' + stringify(
-      data.expected) + '. Actual: ' + stringify(data.actual) + '.');
+    console.log('Failure: ' + data.message + '. Expected: ' + stringify(data.expected) + '. Actual: ' + stringify(data.actual) + '.');
   });
 
   spec.bind('teardown', function(test) {
     // `teardown` is triggered at the end of each test.
-    console.log('Finished test `' + test.name + '`. ' + test.assertions +
-      ' assertions, ' + test.failures + ' failures.');
+    console.log('Finished test `' + test.name + '`. ' + test.assertions + ' assertions, ' + test.failures + ' failures.');
   });
 
   spec.bind('complete', function(spec) {
     // `complete` is triggered once all tests have finished running.
     console.log('Finished spec `' + spec.name + '`.');
-    console.log(this.length + ' tests, ' + this.assertions + ' assertions, ' +
-      this.failures + ' failures.');
+    console.log(this.length + ' specs, ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
   });
 
   spec.test('ajax', function(test) {

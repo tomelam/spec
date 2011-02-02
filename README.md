@@ -108,7 +108,7 @@ Alternatively, you may use the [GitHub issue tracker](http://github.com/kitgonch
 
 In addition to the following [Prototype-inspired](http://prototypejs.org/contribute) guidelines, please follow the conventions already established in the code.
 
-- **Spacing**: Use two spaces, not tabs, for indentation. Avoid lines longer than 80 characters; if necessary, break statements across multiple lines.
+- **Spacing**: Use two spaces for indentation. No tabs.
 - **Naming**: Keep variable and method names concise but descriptive. `index` and `callback` are preferable to `i` and `fn`.
 - **Comments**: Significant changes and new methods should be annotated with single-line comments.
 - **Performance**: Don't overuse abstractions or slow down critical code to add a feature of marginal utility.
