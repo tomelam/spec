@@ -25,22 +25,17 @@
       data.expected, data.actual);
   });
 
-  spec.bind('error', function(error) {
-    // `error` is triggered when a test throws an error.
-    console.error('Error: %o.', error);
-  });
-
   spec.bind('teardown', function(test) {
     // `teardown` is triggered at the end of each test.
-    console.log('Finished test `%s`. %i assertions, %i failures, %i errors.',
-      test.name, test.assertions, test.failures, test.errors);
+    console.log('Finished test `%s`. %i assertions, %i failures.',
+      test.name, test.assertions, test.failures);
   });
 
   spec.bind('complete', function(spec) {
     // `complete` is triggered once all tests have finished running.
     console.log('Finished spec `%s`.', spec.name);
-    console.info('%i tests, %i assertions, %i failures, %i errors.', this.length,
-      this.assertions, this.failures, this.errors);
+    console.info('%i tests, %i assertions, %i failures.', this.length,
+      this.assertions, this.failures);
   });
 
   spec.test('ajax', function(test) {

@@ -242,19 +242,18 @@
 
   // Successively runs all tests in the spec.
   Spec.prototype.run = function() {
-    var spec = this, index, length, onSetup, onAssertion, onFailure,
-    onError, onTeardown;
+    var spec = this, index, length, onSetup, onAssertion, onFailure, onTeardown;
     if (!spec.active) {
       // Avoid race conditions caused by multiple invocations.
       spec.active = true;
       // Create the aggregate spec summary.
-      index = spec.assertions = spec.failures = spec.errors = 0;
+      index = spec.assertions = spec.failures = 0;
       length = spec.length;
       // Triggered at the start of each test.
       onSetup = function(test) {
         // Bind the helper event handlers and trigger the spec's `setup` event.
         test.bind('teardown', onTeardown).bind('assertion', onAssertion).bind(
-          'failure', onFailure).bind('error', onError).unbind('setup', onSetup);
+          'failure', onFailure).unbind('setup', onSetup);
         spec.trigger('setup', test);
       };
       // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
@@ -267,16 +266,11 @@
         spec.failures++;
         spec.trigger('failure', data, test);
       };
-      // Triggered when a test throws an error.
-      onError = function(error, test) {
-        spec.errors++;
-        spec.trigger('error', error, test);
-      };
       // Triggered at the end of each test.
       onTeardown = function(test) {
         // Unbind the helper event handlers.
         test.unbind('teardown', onTeardown).unbind('assertion',
-          onAssertion).unbind('failure', onFailure).unbind('error', onError);
+          onAssertion).unbind('failure', onFailure);
         spec.trigger('teardown', test);
         if (++index < length && index in spec) {
           // Run the next test.
@@ -288,11 +282,7 @@
         }
       };
       // Bind the `onSetup` event handler and begin running the tests.
-      try {
-        spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
-      } catch (error) {
-        spec.trigger('error', error);
-      }
+      spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
     }
     return spec;
   };
@@ -318,24 +308,16 @@
 
   // Runs the test.
   Spec.Test.prototype.run = function() {
-    var ok;
     if (!this.active) {
       // Avoid race conditions.
       this.active = true;
-      this.assertions = this.failures = this.errors = 0;
+      this.assertions = this.failures = 0;
       this.trigger('setup');
-      try {
-        if ((ok = typeof this.test == 'function')) {
-          // Pass the wrapper as the first argument to the test function.
-          this.test(this);
-        }
-      } catch (error) {
-        this.errors++;
-        this.trigger('error', error);
-        ok = false;
-      }
-      if (!ok) {
-        // Finish running the test.
+      if (typeof this.test == 'function') {
+        // Pass the wrapper as the first argument to the test function.
+        this.test(this);
+      } else {
+        // Invalid test function; skip running the test.
         this.done();
       }
     }
