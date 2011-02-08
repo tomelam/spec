@@ -95,86 +95,68 @@
     this.events = {};
   };
 
-  // Binds an event handler. The `handler` function will be invoked each time
+  // Binds an event handler. The `callback` function will be invoked each time
   // the `event`, specified by a string identifier, is fired.
-  Spec.Events.prototype.bind = function(event, handler) {
+  Spec.Events.prototype.bind = function(event, callback) {
     // Create the event registry if it doesn't exist.
-    var handlers;
-    if (event != null && typeof handler == 'function') {
-      if (!(handlers = this.events[event])) {
+    var callbacks;
+    if (event != null && typeof callback == 'function') {
+      if (!(callbacks = this.events[event])) {
         // Single-handler event; avoid creating a handler registry.
-        this.events[event] = handler;
-      } else if (handlers && typeof handlers.push == 'function') {
+        this.events[event] = callback;
+      } else if (callbacks && typeof callbacks.push == 'function') {
         // Multiple-handler event; add the handler to the registry.
-        handlers.push(handler);
+        callbacks.push(callback);
       } else {
         // Convert a single-handler event into a multiple-handler event.
-        this.events[event] = [handlers, handler];
+        this.events[event] = [callbacks, callback];
       }
     }
     return this;
   };
 
-  // Removes a previously-bound event handler. If the `handler` function is
+  // Removes a previously-bound event handler. If the `callback` function is
   // omitted, all handlers for the `event` are removed. If both the event and
   // handler are omitted, *all* event handlers are removed.
-  Spec.Events.prototype.unbind = function(event, handler) {
-    var handlers, length;
-    if (event == null && handler == null) {
+  Spec.Events.prototype.unbind = function(event, callback) {
+    var callbacks, length;
+    if (event == null && callback == null) {
       // Clear the event registry.
       this.events = {};
-    } else if (event != null && (handlers = this.events[event])) {
+    } else if (event != null && (callbacks = this.events[event])) {
       // Omitted handler or single-handler event.
-      if (handler == null || typeof handlers == 'function' &&
-      handlers == handler) {
+      if (callback == null || typeof callbacks == 'function' && callbacks == callback) {
         delete this.events[event];
       } else {
         // Remove the handler from the event handler registry.
-        length = handlers.length;
-        while (length--) if (handlers[length] == handler) handlers.splice(length, 1);
+        length = callbacks.length;
+        while (length--) if (callbacks[length] == callback) callbacks.splice(length, 1);
         // Remove empty handler registries.
-        if (!handlers.length) delete this.events[event];
+        if (!callbacks.length) delete this.events[event];
       }
     }
     return this;
   };
 
-  // Triggers an event, firing all bound event handlers. Subsequent arguments
-  // are passed to each handler.
+  // Triggers an event, firing all bound event handlers. The `event` may be
+  // either a string identifier or an object with a `type` property.
   Spec.Events.prototype.trigger = function(event) {
-    var handlers, handler, index, length, parameters;
-    if (event != null && this.events && (handlers = this.events[event])) {
-      if (typeof handlers == 'function') {
-        // Optimize for 3 or fewer arguments. Based on work by Jeremy Martin.
-        switch (arguments.length) {
-          case 1:
-            handlers.call(this, this);
-            break;
-          case 2:
-            handlers.call(this, arguments[1], this);
-            break;
-          case 3:
-            handlers.call(this, arguments[1], arguments[2], this);
-            break;
-          default:
-            // Pass the event target as the last argument to the handler.
-            (parameters = slice.call(arguments, 1)).push(this);
-            handlers.apply(this, parameters);
-        }
-      } else {
-        if (arguments.length > 1) (parameters = slice.call(arguments, 1)).push(this);
-        // Clone the handler registry before executing any handlers.
-        handlers = slice.call(handlers, 0);
-        for (index = 0, length = handlers.length; index < length; index++) {
-          // Execute each event handler.
-          handler = index in handlers && handlers[index];
-          if (typeof handler == 'function') {
-            if (parameters) {
-              handler.apply(this, parameters);
-            } else {
-              handler.call(this, this);
-            }
-          }
+    var callbacks, callback, index, length;
+    if (event != null && this.events) {
+      // Convert a string identifier to an event object.
+      if (typeof event != 'object') event = {
+        'type': event
+      };
+      if ('type' in event && (callbacks = this.events[event.type])) {
+        if (!event.target) event.target = this;
+        if (typeof callbacks == 'function') {
+          // Trigger a single-handler event.
+          callbacks.call(this, event);
+        } else {
+          // Clone the handler registry before triggering any handlers.
+          callbacks = slice.call(callbacks, 0);
+          // Trigger each event handler.
+          for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
         }
       }
     }
@@ -221,28 +203,26 @@
       index = spec.assertions = spec.failures = 0;
       length = spec.length;
       // Triggered at the start of each test.
-      onSetup = function(test) {
+      onSetup = function(event) {
         // Bind the helper event handlers and trigger the spec's `setup` event.
-        test.bind('teardown', onTeardown).bind('assertion', onAssertion).bind(
-          'failure', onFailure).unbind('setup', onSetup);
-        spec.trigger('setup', test);
+        event.target.bind('teardown', onTeardown).bind('assertion', onAssertion).bind('failure', onFailure).unbind('setup', onSetup);
+        spec.trigger(event);
       };
       // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
-      onAssertion = function(data, test) {
+      onAssertion = function(event) {
         spec.assertions++;
-        spec.trigger('assertion', data, test);
+        spec.trigger(event);
       };
       // Triggered when an assertion fails.
-      onFailure = function(data, test) {
+      onFailure = function(event) {
         spec.failures++;
-        spec.trigger('failure', data, test);
+        spec.trigger(event);
       };
       // Triggered at the end of each test.
-      onTeardown = function(test) {
+      onTeardown = function(event) {
         // Unbind the helper event handlers.
-        test.unbind('teardown', onTeardown).unbind('assertion',
-          onAssertion).unbind('failure', onFailure);
-        spec.trigger('teardown', test);
+        event.target.unbind('teardown', onTeardown).unbind('assertion', onAssertion).unbind('failure', onFailure);
+        spec.trigger(event);
         if (++index < length && index in spec) {
           // Run the next test.
           spec[index].run();
@@ -295,15 +275,16 @@
     return this;
   };
 
-  // Records an assertion and triggers the `assertion` event. The first
-  // argument passed to each event handler is an object containing three
-  // properties: `actual` is the actual value passed to the assertion,
-  // `expected` is the expected value, and `message` is the assertion message.
+  // Records an assertion and triggers the `assertion` event. The event object
+  // passed to each event handler contains three additional properties:
+  // `actual` is the actual value passed to the assertion, `expected` is the
+  // expected value, and `message` is the assertion message.
   Spec.Test.prototype.assert = function(actual, expected, message) {
     // Only record the assertion if the test is running.
     if (this.active) {
       this.assertions++;
-      this.trigger('assertion', {
+      this.trigger({
+        'type': 'assertion',
         'actual': actual,
         'expected': expected,
         'message': message
@@ -318,7 +299,8 @@
     // Only record the failure if the test is running.
     if (this.active) {
       this.failures++;
-      return this.trigger('failure', {
+      return this.trigger({
+        'type': 'failure',
         'actual': actual,
         'expected': expected,
         'message': message
@@ -330,46 +312,39 @@
   // use `.equal()` instead. The optional assertion `message` is passed to each
   // event handler, and defaults to the name of the assertion (e.g., `ok`).
   Spec.Test.prototype.ok = function(value, message) {
-    return this[value ? 'assert' : 'fail'](value, true, message != null ?
-      message : 'ok');
+    return this[value ? 'assert' : 'fail'](value, true, message != null ? message : 'ok');
   };
 
   // Tests whether `actual` is *identical* to `expected`, as determined by the
   // `===` operator.
   Spec.Test.prototype.equal = function(actual, expected, message) {
-    return this[actual === expected ? 'assert' : 'fail'](actual, expected,
-      message != null ? message : 'equal');
+    return this[actual === expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'equal');
   };
 
   // Tests for *strict* inequality (`actual !== expected`).
   Spec.Test.prototype.notEqual = function(actual, expected, message) {
-    return this[actual !== expected ? 'assert' : 'fail'](actual, expected,
-      message != null ? message : 'notEqual');
+    return this[actual !== expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notEqual');
   };
 
   // Tests for *loose* or coercive equality (`actual == expected`).
   Spec.Test.prototype.looseEqual = function(actual, expected, message) {
-    return this[actual == expected ? 'assert' : 'fail'](actual, expected,
-      message != null ? message : 'looseEqual');
+    return this[actual == expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'looseEqual');
   };
 
   // Tests for *loose* inequality (`actual != expected`).
   Spec.Test.prototype.notLooseEqual = function(actual, expected, message) {
-    return this[actual != expected ? 'assert' : 'fail'](actual, expected,
-      message != null ? message : 'notLooseEqual');
+    return this[actual != expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notLooseEqual');
   };
 
   // Tests for deep equality and equivalence, as determined by the result of
   // the `eq()` function.
   Spec.Test.prototype.deepEqual = function(actual, expected, message) {
-    return this[eq(actual, expected, []) ? 'assert' : 'fail'](actual,
-      expected, message != null ? message : 'deepEqual');
+    return this[eq(actual, expected, []) ? 'assert' : 'fail'](actual, expected, message != null ? message : 'deepEqual');
   };
 
   // Tests for deep inequality.
   Spec.Test.prototype.notDeepEqual = function(actual, expected, message) {
-    return this[eq(actual, expected, []) ? 'fail' : 'assert'](actual,
-      expected, message != null ? message : 'notDeepEqual');
+    return this[eq(actual, expected, []) ? 'fail' : 'assert'](actual, expected, message != null ? message : 'notDeepEqual');
   };
 
   // Tests whether the function `block` throws an error. Both `expected` and
@@ -377,8 +352,7 @@
   // a RegExp and the `message` is omitted, the value of `expected` is used as
   // the message.
   Spec.Test.prototype.raises = function(block, expected, message) {
-    var ok = false, isFunction = typeof expected == 'function',
-    isRegExp = expected && toString.call(expected) == '[object RegExp]';
+    var ok = false, isFunction = typeof expected == 'function', isRegExp = expected && toString.call(expected) == '[object RegExp]';
     // The message was passed as the second argument.
     if (!isFunction && !isRegExp && message == null) {
       message = expected;

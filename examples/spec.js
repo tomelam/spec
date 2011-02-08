@@ -123,29 +123,30 @@
     console.log('Started spec `' + this.name + '`.');
   });
 
-  spec.bind('setup', function(test, spec) {
+  spec.bind('setup', function(event) {
     // `setup` is triggered at the start of each test.
-    console.log('Started test `' + test.name + '`.');
+    console.log('Started test `' + event.target.name + '`.');
   });
 
-  spec.bind('assertion', function(data, test) {
+  spec.bind('assertion', function(event) {
     // `assertion` is triggered when an assertion succeeds.
-    console.log('Assertion: ' + data.message + '.');
+    console.log('Assertion: ' + event.message + '.');
   });
 
-  spec.bind('failure', function(data) {
+  spec.bind('failure', function(event) {
     // `failure` is triggered when an assertion fails.
-    console.log('Failure: ' + data.message + '. Expected: ' + stringify(data.expected) + '. Actual: ' + stringify(data.actual) + '.');
+    console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
   });
 
-  spec.bind('teardown', function(test) {
+  spec.bind('teardown', function(event) {
     // `teardown` is triggered at the end of each test.
+    var test = event.target;
     console.log('Finished test `' + test.name + '`. ' + test.assertions + ' assertions, ' + test.failures + ' failures.');
   });
 
-  spec.bind('complete', function(spec) {
+  spec.bind('complete', function(event) {
     // `complete` is triggered once all tests have finished running.
-    console.log('Finished spec `' + spec.name + '`.');
+    console.log('Finished spec `' + event.target.name + '`.');
     console.log(this.length + ' specs, ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
   });
 
