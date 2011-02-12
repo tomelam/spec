@@ -82,7 +82,7 @@
   };
 
   // The current version of Spec. Keep in sync with `package.json`.
-  Spec.version = '0.9.9';
+  Spec.version = '1.0.0pre';
 
   // Custom Events
   // -------------

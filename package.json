@@ -1,6 +1,6 @@
 {
   "name": "spec",
-  "version": "0.9.9",
+  "version": "1.0.0pre",
   "description": "An event-driven JavaScript unit testing library.",
   "homepage": "http://github.com/kitgoncharov/Spec",
   "main": "spec",
