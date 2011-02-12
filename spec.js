@@ -33,14 +33,15 @@
     switch (className) {
       // Compare strings, numbers, dates, and booleans by value.
       case '[object String]':
+        // Primitives and their corresponding object wrappers are equal.
+        return left + '' == right + '';
       case '[object Number]':
       case '[object Date]':
       case '[object Boolean]':
-        // Primitives and their corresponding object wrappers are equal.
-        left = left.valueOf();
-        right = right.valueOf();
+        left = +left;
+        right = +right;
         // `NaN`s are non-reflexive.
-        return left != left ? right != right : left === right;
+        return left != left ? right != right : left == right;
       // Compare regular expressions.
       case '[object RegExp]':
         return left.source == right.source && left.global == right.global && left.multiline == right.multiline && left.ignoreCase == right.ignoreCase;
@@ -69,10 +70,8 @@
       }
       // Ensure that the objects have the same number of properties.
       if (result) {
-        for (key in right) {
-          // Break as soon as the expected number of properties is greater.
-          if (++sizeRight > size) break;
-        }
+        // Break as soon as the expected number of properties is greater.
+        for (key in right) if (++sizeRight > size) break;
         result = size == sizeRight;
       }
       // Remove the object from the stack once the deep comparison is complete.
@@ -116,8 +115,8 @@
       // Remove the handler from the event handler registry.
       length = callbacks.length;
       while (length--) if (callbacks[length] == callback) callbacks.splice(length, 1);
-      // Remove empty handler registries.
-      if (!callbacks.length || callback == null) delete this.events[event];
+      // Remove the handler registry if it is empty or the handler was omitted.
+      if (callback == null || !callbacks.length) delete this.events[event];
     }
     return this;
   };
@@ -128,21 +127,19 @@
     var callbacks, callback, index, length;
     if (event != null && this.events) {
       // Convert a string identifier to an event object.
-      if (typeof event != 'object') event = {
-        'type': event
-      };
+      if (typeof event != 'object') event = {'type': event};
       // Pass the current event target to each event handler for convenience.
-      if (!event.target) event.target = this;
-      if ((callbacks = event.type != null && event.type != 'all' && this.events[event.type]) && callbacks.length) {
+      if (event.target == null) event.target = this;
+      if ((callbacks = event.type != null && event.type != 'all' && this.events[event.type]) && (length = callbacks.length)) {
         // Clone the handler registry before triggering any handlers.
         callbacks = slice.call(callbacks, 0);
         // Trigger each event handler.
-        for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
+        for (index = 0; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
       }
       // Trigger the special `all` event.
-      if ((callbacks = this.events.all) && callbacks.length) {
+      if ((callbacks = this.events.all) && (length = callbacks.length)) {
         callbacks = slice.call(callbacks, 0);
-        for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
+        for (index = 0; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
       }
     }
     return this;
@@ -185,31 +182,50 @@
       // Avoid race conditions caused by multiple invocations.
       spec.active = true;
       // Create the aggregate spec summary.
-      index = spec.assertions = spec.failures = 0;
+      index = spec.assertions = spec.failures = spec.errors = 0;
       length = spec.length;
       // A proxy event handler.
       onEvent = function(event) {
+        var test;
+        try {
+          spec.trigger(event);
+        } catch (error) {
+          spec.errors++;
+          spec.trigger({
+            'type': 'error',
+            'error': error
+          });
+        }
+        // Update the aggregate spec summary.
         switch (event.type) {
-          case 'setup':
+          case 'assertion':
+            spec.assertions++;
+            break;
+          case 'failure':
+            spec.failures++;
+            break;
+          case 'error':
+            spec.errors++;
+            break;
           case 'teardown':
-            event.test = event.target.name;
-            spec.trigger(event);
-            if (event.type == 'teardown') {
-              // Unbind the proxy event handler.
-              event.target.unbind('all', onEvent);
-              if (++index < length && index in spec) {
-                // Run the next test.
-                spec[index].run();
-              } else {
-                // Finish running the spec.
-                spec.active = false;
+            // Unbind the proxy event handler.
+            event.target.unbind('all', onEvent);
+            if ((test = spec[++index]) && typeof test.run == 'function') {
+              // Run the next test.
+              test.run();
+            } else {
+              // Finish running the spec.
+              spec.active = false;
+              try {
                 spec.trigger('complete');
+              } catch (exception) {
+                spec.errors++;
+                spec.trigger({
+                  'type': 'error',
+                  'error': exception
+                });
               }
             }
-            break;
-          case 'assertion':
-          case 'failure':
-            spec.trigger(event)[event.type + 's']++;
         }
       };
       // Bind the proxy event handler and begin running the tests.
@@ -244,13 +260,18 @@
       // Avoid race conditions.
       this.active = true;
       this.assertions = this.failures = 0;
-      this.trigger('setup');
-      if (typeof this.test == 'function') {
+      try {
+        this.trigger('setup');
         // Pass the wrapper as the first argument to the test function.
-        this.test(this);
-      } else {
-        // Invalid test function; skip running the test.
-        this.done();
+        if ((ok = typeof this.test == 'function')) this.test(this);
+      } catch (error) {
+        ok = false;
+        this.trigger({
+          'type': 'error',
+          'error': error
+        });
+      } finally {
+        if (!ok) this.done();
       }
     }
     return this;
@@ -264,12 +285,19 @@
     // Only record the assertion if the test is running.
     if (this.active) {
       this.assertions++;
-      this.trigger({
-        'type': 'assertion',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
+      try {
+        this.trigger({
+          'type': 'assertion',
+          'actual': actual,
+          'expected': expected,
+          'message': message
+        });
+      } catch (error) {
+        this.trigger({
+          'type': 'error',
+          'error': error
+        });
+      }
     }
     return this;
   };
@@ -280,13 +308,21 @@
     // Only record the failure if the test is running.
     if (this.active) {
       this.failures++;
-      return this.trigger({
-        'type': 'failure',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
+      try {
+        this.trigger({
+          'type': 'failure',
+          'actual': actual,
+          'expected': expected,
+          'message': message
+        });
+      } catch (error) {
+        this.trigger({
+          'type': 'error',
+          'error': error
+        });
+      }
     }
+    return this;
   };
 
   // Tests whether `value` is truthy. To test strictly for the boolean `true`,
@@ -363,11 +399,14 @@
       this.active = false;
       // Verify that the expected number of assertions were executed.
       if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
-      this.trigger({
-        'type': 'teardown',
-        'assertions': this.assertions,
-        'failures': this.failures
-      });
+      try {
+        this.trigger('teardown');
+      } catch (error) {
+        this.trigger({
+          'type': 'error',
+          'error': error
+        });
+      }
     }
     return this;
   };

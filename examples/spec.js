@@ -137,6 +137,11 @@
     // `failure` is triggered when an assertion fails.
     console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
   });
+  
+  spec.bind('error', function(event) {
+    // `error` is triggered when a test throws an error.
+    console.log('Error: ' + stringify(event.error));
+  })
 
   spec.bind('teardown', function(event) {
     // `teardown` is triggered at the end of each test.
@@ -147,7 +152,7 @@
   spec.bind('complete', function(event) {
     // `complete` is triggered once all tests have finished running.
     console.log('Finished spec `' + event.target.name + '`.');
-    console.log(this.length + ' tests, ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
+    console.log(this.length + ' tests, ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });
 
   spec.test('ajax', function(test) {
