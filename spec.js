@@ -13,7 +13,7 @@
   // -------------
 
   // Convenience aliases.
-  var toString = Object.prototype.toString, slice = Array.prototype.slice,
+  var toString = {}.toString, slice = [].slice,
 
   // Creates a new spec, or collection of related unit tests.
   Spec = this.Spec = function(name) {
@@ -96,22 +96,11 @@
   };
 
   // Binds an event handler. The `callback` function will be invoked each time
-  // the `event`, specified by a string identifier, is fired.
+  // the `event`, specified by a string identifier, is fired. `callback`s bound
+  // to the `all` event will be invoked when *any* event is `trigger`-ed.
   Spec.Events.prototype.bind = function(event, callback) {
-    // Create the event registry if it doesn't exist.
-    var callbacks;
-    if (event != null && typeof callback == 'function') {
-      if (!(callbacks = this.events[event])) {
-        // Single-handler event; avoid creating a handler registry.
-        this.events[event] = callback;
-      } else if (callbacks && typeof callbacks.push == 'function') {
-        // Multiple-handler event; add the handler to the registry.
-        callbacks.push(callback);
-      } else {
-        // Convert a single-handler event into a multiple-handler event.
-        this.events[event] = [callbacks, callback];
-      }
-    }
+    // Add the event handler to the event handler registry.
+    if (event != null && typeof callback == 'function') (this.events[event] || (this.events[event] = [])).push(callback);
     return this;
   };
 
@@ -124,22 +113,17 @@
       // Clear the event registry.
       this.events = {};
     } else if (event != null && (callbacks = this.events[event])) {
-      // Omitted handler or single-handler event.
-      if (callback == null || typeof callbacks == 'function' && callbacks == callback) {
-        delete this.events[event];
-      } else {
-        // Remove the handler from the event handler registry.
-        length = callbacks.length;
-        while (length--) if (callbacks[length] == callback) callbacks.splice(length, 1);
-        // Remove empty handler registries.
-        if (!callbacks.length) delete this.events[event];
-      }
+      // Remove the handler from the event handler registry.
+      length = callbacks.length;
+      while (length--) if (callbacks[length] == callback) callbacks.splice(length, 1);
+      // Remove empty handler registries.
+      if (!callbacks.length || callback == null) delete this.events[event];
     }
     return this;
   };
 
   // Triggers an event, firing all bound event handlers. The `event` may be
-  // either a string identifier or an object with a `type` property.
+  // either a string identifier or an event object with a `type` property.
   Spec.Events.prototype.trigger = function(event) {
     var callbacks, callback, index, length;
     if (event != null && this.events) {
@@ -147,17 +131,18 @@
       if (typeof event != 'object') event = {
         'type': event
       };
-      if ('type' in event && (callbacks = this.events[event.type])) {
-        if (!event.target) event.target = this;
-        if (typeof callbacks == 'function') {
-          // Trigger a single-handler event.
-          callbacks.call(this, event);
-        } else {
-          // Clone the handler registry before triggering any handlers.
-          callbacks = slice.call(callbacks, 0);
-          // Trigger each event handler.
-          for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
-        }
+      // Pass the current event target to each event handler for convenience.
+      if (!event.target) event.target = this;
+      if ((callbacks = event.type != null && event.type != 'all' && this.events[event.type]) && callbacks.length) {
+        // Clone the handler registry before triggering any handlers.
+        callbacks = slice.call(callbacks, 0);
+        // Trigger each event handler.
+        for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
+      }
+      // Trigger the special `all` event.
+      if ((callbacks = this.events.all) && callbacks.length) {
+        callbacks = slice.call(callbacks, 0);
+        for (index = 0, length = callbacks.length; index < length; index++) if (typeof (callback = index in callbacks && callbacks[index]) == 'function') callback.call(this, event);
       }
     }
     return this;
@@ -195,45 +180,40 @@
 
   // Successively runs all tests in the spec.
   Spec.prototype.run = function() {
-    var spec = this, index, length, onSetup, onAssertion, onFailure, onTeardown;
+    var spec = this, index, length, onEvent;
     if (!spec.active) {
       // Avoid race conditions caused by multiple invocations.
       spec.active = true;
       // Create the aggregate spec summary.
       index = spec.assertions = spec.failures = 0;
       length = spec.length;
-      // Triggered at the start of each test.
-      onSetup = function(event) {
-        // Bind the helper event handlers and trigger the spec's `setup` event.
-        event.target.bind('teardown', onTeardown).bind('assertion', onAssertion).bind('failure', onFailure).unbind('setup', onSetup);
-        spec.trigger(event);
-      };
-      // Triggered when an assertion (`ok`, `equal`, etc.) succeeds.
-      onAssertion = function(event) {
-        spec.assertions++;
-        spec.trigger(event);
-      };
-      // Triggered when an assertion fails.
-      onFailure = function(event) {
-        spec.failures++;
-        spec.trigger(event);
-      };
-      // Triggered at the end of each test.
-      onTeardown = function(event) {
-        // Unbind the helper event handlers.
-        event.target.unbind('teardown', onTeardown).unbind('assertion', onAssertion).unbind('failure', onFailure);
-        spec.trigger(event);
-        if (++index < length && index in spec) {
-          // Run the next test.
-          spec[index].run();
-        } else {
-          // Finish running the spec.
-          spec.active = false;
-          spec.trigger('complete');
+      // A proxy event handler.
+      onEvent = function(event) {
+        switch (event.type) {
+          case 'setup':
+          case 'teardown':
+            event.test = event.target.name;
+            spec.trigger(event);
+            if (event.type == 'teardown') {
+              // Unbind the proxy event handler.
+              event.target.unbind('all', onEvent);
+              if (++index < length && index in spec) {
+                // Run the next test.
+                spec[index].run();
+              } else {
+                // Finish running the spec.
+                spec.active = false;
+                spec.trigger('complete');
+              }
+            }
+            break;
+          case 'assertion':
+          case 'failure':
+            spec.trigger(event)[event.type + 's']++;
         }
       };
-      // Bind the `onSetup` event handler and begin running the tests.
-      spec.invoke('bind', 'setup', onSetup).trigger('start')[index].run();
+      // Bind the proxy event handler and begin running the tests.
+      spec.invoke('bind', 'all', onEvent).trigger('start')[index].run();
     }
     return spec;
   };
@@ -259,6 +239,7 @@
 
   // Runs the test.
   Spec.Test.prototype.run = function() {
+    var ok;
     if (!this.active) {
       // Avoid race conditions.
       this.active = true;
@@ -382,7 +363,11 @@
       this.active = false;
       // Verify that the expected number of assertions were executed.
       if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
-      this.trigger('teardown');
+      this.trigger({
+        'type': 'teardown',
+        'assertions': this.assertions,
+        'failures': this.failures
+      });
     }
     return this;
   };
