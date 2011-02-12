@@ -137,11 +137,11 @@
     // `failure` is triggered when an assertion fails.
     console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
   });
-  
+
   spec.bind('error', function(event) {
     // `error` is triggered when a test throws an error.
     console.log('Error: ' + stringify(event.error));
-  })
+  });
 
   spec.bind('teardown', function(event) {
     // `teardown` is triggered at the end of each test.
