@@ -10,7 +10,7 @@ if (typeof require == 'function' && typeof exports == 'object' && exports) {
   load('../spec.js');
 }
 
-if (!Spec) throw new Error('Spec is required to run the unit tests.');
+if (typeof Spec != 'function') throw new Error('Spec is required to run the unit tests.');
 
 (function() {
   var Tests = Spec.Tests = new Spec('Spec Unit Tests'), stringify = typeof JSON == 'object' && JSON && JSON.stringify;
@@ -44,14 +44,63 @@ if (!Spec) throw new Error('Spec is required to run the unit tests.');
     console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });
 
-  // Add the tests.
-  Tests.add('Spec#bind', function() {
+  Tests.add('Spec::bind', function() {
     // ...
     this.done(0);
-  }).add('Spec#unbind', function() {
+  }).add('Spec::unbind', function() {
     // ...
     this.done(0);
-  }).add('Spec#trigger', function() {
+  }).add('Spec::trigger', function() {
+    // ...
+    this.done(0);
+  }).add('Spec::add', function() {
+    // ...
+    this.done(0);
+  }).add('Spec::run', function() {
+    // ...
+    this.done(0);
+  }).add('Spec::Array Methods', function() {
+    // ...
+    this.done(0);
+  });
+
+  Tests.add('Test::run', function() {
+    // ...
+    this.done(0);
+  }).add('Test::ok', function() {
+    // ...
+    this.done(0);
+  }).add('Test::equal', function() {
+    // ...
+    this.done(0);
+  }).add('Test::notEqual', function() {
+    // ...
+    this.done(0);
+  }).add('Test::looseEqual', function() {
+    // ...
+    this.done(0);
+  }).add('Test::notLooseEqual', function() {
+    // ...
+    this.done(0);
+  }).add('Test::deepEqual', function() {
+    // ...
+    this.done(0);
+  }).add('Test::notDeepEqual', function() {
+    // ...
+    this.done(0);
+  }).add('Test::raises', function() {
+    // ...
+    this.done(0);
+  }).add('Test::done', function() {
+    // ...
+    this.done(0);
+  }).add('Test::bind', function() {
+    // ...
+    this.done(0);
+  }).add('Test::unbind', function() {
+    // ...
+    this.done(0);
+  }).add('Test::trigger', function() {
     // ...
     this.done(0);
   });
