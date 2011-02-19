@@ -359,7 +359,7 @@
     // Create the event registry if it doesn't exist.
     var events = typeof this.events == 'object' && this.events || (this.events = {});
     // Add the event listener to the listener registry.
-    if (type != null && typeof listener == 'function') (events[type] || (events[type] = [])).push(listener);
+    if (typeof type == 'string' && type && typeof listener == 'function') (events[type] || (events[type] = [])).push(listener);
     return this;
   };
 
@@ -372,7 +372,7 @@
       if (type == null && listener == null) {
         // Remove all event listeners.
         this.events = {};
-      } else if (type != null && (listeners = events[type]) && (length = listeners.length)) {
+      } else if (typeof type == 'string' && type && (listeners = events[type]) && (length = listeners.length)) {
         // Remove the listener from the event listener registry.
         while (length--) if (listeners[length] == listener) listeners.splice(length, 1);
         // Remove the listener registry if it is empty or the listener was omitted.
@@ -385,14 +385,14 @@
   // Triggers an event, specified by either a string identifier or an event
   // object with a `type` property.
   Spec.prototype.trigger = Spec.Test.prototype.trigger = function(event) {
-    var events = this.events, type, listeners, listener, index, length;
-    if (event != null && typeof events == 'object' && events) {
+    var events = this.events, isEvent = typeof event == 'object', type, listeners, listener, index, length;
+    if ((isEvent || typeof event == 'string') && event && typeof events == 'object' && events) {
       // Convert a string identifier into an event object.
-      if (typeof event != 'object') event = {'type': event};
+      if (!isEvent) event = {'type': event};
       type = event.type;
       // Capture a reference to the current event target.
       if (!('target' in event)) event.target = this;
-      if ((listeners = type != null && type != 'all' && events[type]) && (length = listeners.length)) {
+      if ((listeners = typeof type == 'string' && type != 'all' && events[type]) && (length = listeners.length)) {
         // Clone the event listener registry.
         listeners = slice.call(listeners, 0);
         // Execute each event listener.
