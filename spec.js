@@ -108,43 +108,33 @@
     // Successively runs each test in the spec.
     'run': function() {
       var spec = this, onTestEvent, index, length;
-      if (!spec.active) {
-        // Avoid race conditions caused by multiple invocations.
-        spec.active = true;
-        // Create the aggregate spec summary.
-        spec.assertions = spec.failures = 0;
-        // Internal method called every time a test triggers an event.
-        onTestEvent = function(event) {
-          var test = event.target, type = event.type;
-          // Proxy the triggered event.
-          spec.trigger(event);
-          switch (type) {
-            // Update the spec summary.
-            case 'assertion':
-              spec.assertions++;
-              break;
-            case 'failure':
-              spec.failures++;
-              break;
-            case 'teardown':
-              // Unbind the helper event listener.
-              test.unbind('all', onTestEvent);
-              // Remove the completed test and run the next test.
-              if ((test = spec.shift()) && typeof test.run == 'function') {
-                test.run();
-              } else {
-                // Ensure that the spec is empty.
-                if (!spec.length) delete spec[0];
-                // Finish running the spec.
-                spec.active = false;
-                spec.trigger('complete');
-              }
+      // Create the aggregate spec summary.
+      spec.assertions = spec.failures = 0;
+      // Internal method called every time a test triggers an event.
+      onTestEvent = function(event) {
+        var test = event.target, type = event.type;
+        // Proxy the triggered event.
+        spec.trigger(event);
+        if (type == 'teardown') {
+          // Update the spec summary.
+          spec.assertions += test.assertions;
+          spec.failures += test.failures;
+          // Unbind the helper event listener.
+          test.unbind('all', onTestEvent);
+          // Remove the completed test and run the next test.
+          if ((test = spec.shift()) && typeof test.run == 'function') {
+            test.run();
+          } else {
+            // Ensure that the spec is empty.
+            if (!spec.length) delete spec[0];
+            // Finish running the spec.
+            spec.trigger('complete');
           }
-        };
-        // Bind the helper event listener and run the tests.
-        for (index = 0, length = spec.length; index < length; index++) spec[index].bind('all', onTestEvent);
-        spec.trigger('start').shift().run();
-      }
+        }
+      };
+      // Bind the helper event listener and run the tests.
+      for (index = 0, length = spec.length; index < length; index++) spec[index].bind('all', onTestEvent);
+      spec.trigger('start').shift().run();
       return spec;
     }
   };
@@ -169,23 +159,19 @@
     // Runs the test.
     'run': function() {
       var ok;
-      if (!this.active) {
-        // Avoid race conditions.
-        this.active = true;
-        this.assertions = this.failures = 0;
-        this.trigger('setup');
-        try {
-          // Pass the wrapper as the first argument to the test function.
-          if ((ok = typeof this.test == 'function')) this.test(this);
-        } catch (error) {
-          ok = false;
-          this.trigger({
-            'type': 'error',
-            'error': error
-          });
-        } finally {
-          if (!ok) this.done();
-        }
+      this.assertions = this.failures = 0;
+      this.trigger('setup');
+      try {
+        // Pass the wrapper as the first argument to the test function.
+        if ((ok = typeof this.test == 'function')) this.test(this);
+      } catch (error) {
+        ok = false;
+        this.trigger({
+          'type': 'error',
+          'error': error
+        });
+      } finally {
+        if (!ok) this.done();
       }
       return this;
     },
@@ -196,31 +182,25 @@
     // and `message` is the assertion message.
     'assert': function(actual, expected, message) {
       // Only record the assertion if the test is running.
-      if (this.active) {
-        this.assertions++;
-        this.trigger({
-          'type': 'assertion',
-          'actual': actual,
-          'expected': expected,
-          'message': message
-        });
-      }
-      return this;
+      this.assertions++;
+      return this.trigger({
+        'type': 'assertion',
+        'actual': actual,
+        'expected': expected,
+        'message': message
+      });
     },
 
     // The opposite of `.assert()`; records a failure and triggers the
     // `failure` event.
     'fail': function(actual, expected, message) {
-      if (this.active) {
-        this.failures++;
-        this.trigger({
-          'type': 'failure',
-          'actual': actual,
-          'expected': expected,
-          'message': message
-        });
-      }
-      return this;
+      this.failures++;
+      return this.trigger({
+        'type': 'failure',
+        'actual': actual,
+        'expected': expected,
+        'message': message
+      });
     },
 
     // Tests whether `value` is truthy. To test strictly for the boolean `true`,
@@ -289,14 +269,9 @@
     // Completes a test with an optional expected number of `assertions`. This
     // method **must** be called at the end of each test.
     'done': function(assertions) {
-      if (this.active) {
-        // Avoid race conditions.
-        this.active = false;
-        // Verify that the expected number of assertions were executed.
-        if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
-        this.trigger('teardown');
-      }
-      return this;
+      // Verify that the expected number of assertions were executed.
+      if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
+      return this.trigger('teardown');
     }
   };
 
