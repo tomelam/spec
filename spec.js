@@ -187,39 +187,31 @@
   Spec.prototype.name = 'Anonymous Spec';
 
   // Adds a new `test` function to the spec. The test `name` is optional.
-  Spec.prototype.test = function(name, test) {
+  Spec.prototype.add = function(name, test) {
     this.push(new Spec.Test(name, test));
     return this;
   };
-
-  // Invokes the method with `name` for each test in the spec. All subsequent
-  // arguments are passed to the invoked method.
-  Spec.prototype.invoke = function(name) {
-    var parameters = slice.call(arguments, 1), index, length, test, method;
-    for (index = 0, length = this.length; index < length; index++) {
-      test = index in this && this[index];
-      if (test && typeof (method = test[name]) == 'function') method.apply(test, parameters);
-    }
-    return this;
-  };
   
-  // Convenience methods.
+  // Array methods.
+  Spec.prototype.pop = [].pop;
   Spec.prototype.push = [].push;
+  Spec.prototype.reverse = [].reverse;
   Spec.prototype.shift = [].shift;
-  Spec.prototype.splice = [].splice;
+  Spec.prototype.sort = [].sort;
+  Spec.prototype.unshift = [].unshift;
 
   // Successively runs each test in the spec.
   Spec.prototype.run = function() {
-    var spec = this, onEvent;
+    var spec = this, onTestEvent, index, length;
     if (!spec.active) {
       // Avoid race conditions caused by multiple invocations.
       spec.active = true;
       // Create the aggregate spec summary.
       spec.assertions = spec.failures = 0;
-      // A proxy event listener.
-      onEvent = function(event) {
+      // Internal method called every time a test triggers an event.
+      onTestEvent = function(event) {
         var test = event.target, type = event.type;
-        // Trigger the proxied event.
+        // Proxy the triggered event.
         spec.trigger(event);
         switch (type) {
           // Update the spec summary.
@@ -230,21 +222,23 @@
             spec.failures++;
             break;
           case 'teardown':
-            // Unbind the proxy listener.
-            test.unbind('all', onEvent);
-            // Remove completed tests from the spec.
+            // Unbind the helper event listener.
+            test.unbind('all', onTestEvent);
+            // Remove the completed test and run the next test.
             if ((test = spec.shift()) && typeof test.run == 'function') {
-              // Run the next test.
               test.run();
             } else {
+              // Ensure that the spec is empty.
+              if (!spec.length) delete spec[0];
               // Finish running the spec.
               spec.active = false;
               spec.trigger('complete');
             }
         }
       };
-      // Bind the proxy event listener and run the tests.
-      spec.invoke('bind', 'all', onEvent).trigger('start').shift().run();
+      // Bind the helper event listener and run the tests.
+      for (index = 0, length = spec.length; index < length; index++) spec[index].bind('all', onTestEvent);
+      spec.trigger('start').shift().run();
     }
     return spec;
   };

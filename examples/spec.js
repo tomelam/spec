@@ -154,7 +154,7 @@
     console.log('Finished spec `' + event.target.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
   });
 
-  spec.test('ajax', function(test) {
+  spec.add('ajax', function(test) {
     Miniatures.ajax({
       'url': 'spec.html',
       'complete': function(transport) {
@@ -164,7 +164,7 @@
     });
   });
 
-  spec.test('sortBy', function(test) {
+  spec.add('sortBy', function(test) {
     var data = [{
       'name': 'John-David Dalton',
       'nickname': 'jddalton'
