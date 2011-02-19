@@ -152,7 +152,7 @@
   spec.bind('complete', function(event) {
     // `complete` is triggered once all tests have finished running.
     console.log('Finished spec `' + event.target.name + '`.');
-    console.log(this.length + ' tests, ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
+    console.log(this.length + ' tests, ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
   });
 
   spec.test('ajax', function(test) {
