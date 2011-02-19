@@ -178,68 +178,125 @@
       return this;
     },
 
-    // Records an assertion and triggers the `assertion` event. The event object
-    // passed to each listener contains three additional properties: `actual` is
-    // the actual value passed to the assertion, `expected` is the expected value,
-    // and `message` is the assertion message.
-    'assert': function(actual, expected, message) {
-      // Only record the assertion if the test is running.
-      this.assertions++;
-      return this.trigger({
-        'type': 'assertion',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
-    },
-
-    // The opposite of `.assert()`; records a failure and triggers the
-    // `failure` event.
-    'fail': function(actual, expected, message) {
-      this.failures++;
-      return this.trigger({
-        'type': 'failure',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
-    },
-
     // Tests whether `value` is truthy. To test strictly for the boolean `true`,
     // use `.equal()` instead. The optional assertion `message` is passed to each
     // event listener, and defaults to the name of the assertion (e.g., `ok`).
     'ok': function(value, message) {
-      return this[value ? 'assert' : 'fail'](value, true, message != null ? message : 'ok');
+      var event = {
+        'actual': value,
+        'expected': true,
+        'message': typeof message == 'string' && message || 'ok'
+      };
+      if (value) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests whether `actual` is **identical** to `expected`, as determined by the `===` operator.
     'equal': function(actual, expected, message) {
-      return this[actual === expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'equal');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'equal'
+      };
+      if (actual === expected) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests for **strict** inequality (`actual !== expected`).
     'notEqual': function(actual, expected, message) {
-      return this[actual !== expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notEqual');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'notEqual'
+      };
+      if (actual !== expected) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests for **loose** inequality (`actual != expected`).
     'looseEqual': function(actual, expected, message) {
-      return this[actual == expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'looseEqual');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'looseEqual'
+      };
+      if (actual == expected) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests for **loose** inequality (`actual != expected`).
     'notLooseEqual': function(actual, expected, message) {
-      return this[actual != expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notLooseEqual');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'notLooseEqual'
+      };
+      if (actual != expected) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests for deep equality and equivalence, as determined by the `eq()` function.
     'deepEqual': function(actual, expected, message) {
-      return this[eq(actual, expected, []) ? 'assert' : 'fail'](actual, expected, message != null ? message : 'deepEqual');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'deepEqual'
+      };
+      if (eq(actual, expected, [])) {
+        this.assertions++;
+        event.type = 'assertion';
+      } else {
+        this.failures++;
+        event.type = 'failure';
+      }
+      return this.trigger(event);
     },
 
     // Tests for deep inequality.
     'notDeepEqual': function(actual, expected, message) {
-      return this[eq(actual, expected, []) ? 'fail' : 'assert'](actual, expected, message != null ? message : 'notDeepEqual');
+      var event = {
+        'actual': actual,
+        'expected': expected,
+        'message': typeof message == 'string' && message || 'notDeepEqual'
+      };
+      if (eq(actual, expected, [])) {
+        this.failures++;
+        event.type = 'failure';
+      } else {
+        this.assertions++;
+        event.type = 'assertion';
+      }
+      return this.trigger(event);
     },
 
     // Tests whether the function `block` throws an error. Both `expected` and
@@ -267,14 +324,22 @@
           }
         }
       }
-      return this.ok(ok, message != null ? message : 'raises');
+      return this.ok(ok, typeof message == 'string' && message || 'raises');
     },
 
     // Completes a test with an optional expected number of `assertions`. This
     // method **must** be called at the end of each test.
     'done': function(assertions) {
       // Verify that the expected number of assertions were executed.
-      if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
+      if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) {
+        this.failures++;
+        this.trigger({
+          'type': 'failure',
+          'actual': this.assertions,
+          'expected': 'assertions',
+          'message': 'done'
+        });
+      }
       return this.trigger('teardown');
     }
   };
