@@ -15,9 +15,8 @@
   // Convenience aliases.
   var toString = {}.toString, slice = [].slice,
 
-  // Creates a new **spec**. A spec is a collection of related unit tests.
+  // Creates a new spec. The spec `name` is optional.
   Spec = this.Spec = function(name) {
-    // The spec name is optional.
     if (name != null) this.name = name;
   },
 
@@ -85,19 +84,234 @@
   // The current version of Spec. Keep in sync with `package.json`.
   Spec.version = '1.0.0rc1';
 
+  // Specs
+  // -----
+
+  // Methods for extending and running specs. A spec is a collection of related unit tests.
+  Spec.prototype = {
+    'constructor': Spec,
+
+    // Adds a new `test` function to the spec. The test `name` is optional.
+    'add': function(name, test) {
+      this.push(new Spec.Test(name, test));
+      return this;
+    },
+
+    // Array methods.
+    'pop': [].pop,
+    'push': [].push,
+    'reverse': [].reverse,
+    'shift': [].shift,
+    'sort': [].sort,
+    'unshift': [].unshift,
+
+    // Successively runs each test in the spec.
+    'run': function() {
+      var spec = this, onTestEvent, index, length;
+      if (!spec.active) {
+        // Avoid race conditions caused by multiple invocations.
+        spec.active = true;
+        // Create the aggregate spec summary.
+        spec.assertions = spec.failures = 0;
+        // Internal method called every time a test triggers an event.
+        onTestEvent = function(event) {
+          var test = event.target, type = event.type;
+          // Proxy the triggered event.
+          spec.trigger(event);
+          switch (type) {
+            // Update the spec summary.
+            case 'assertion':
+              spec.assertions++;
+              break;
+            case 'failure':
+              spec.failures++;
+              break;
+            case 'teardown':
+              // Unbind the helper event listener.
+              test.unbind('all', onTestEvent);
+              // Remove the completed test and run the next test.
+              if ((test = spec.shift()) && typeof test.run == 'function') {
+                test.run();
+              } else {
+                // Ensure that the spec is empty.
+                if (!spec.length) delete spec[0];
+                // Finish running the spec.
+                spec.active = false;
+                spec.trigger('complete');
+              }
+          }
+        };
+        // Bind the helper event listener and run the tests.
+        for (index = 0, length = spec.length; index < length; index++) spec[index].bind('all', onTestEvent);
+        spec.trigger('start').shift().run();
+      }
+      return spec;
+    }
+  };
+
+  // Tests
+  // -----
+
+  // Wraps a `test` function with several convenience methods and assertions. The
+  // test `name` is optional.
+  Spec.Test = function(name, test) {
+    if (typeof name == 'function' && test == null) {
+      test = name;
+    } else if (name != null) {
+      this.name = name;
+    }
+    this.test = typeof test == 'function' ? test : null;
+  };
+
+  Spec.Test.prototype = {
+    'constructor': Spec.Test,
+
+    // Runs the test.
+    'run': function() {
+      var ok;
+      if (!this.active) {
+        // Avoid race conditions.
+        this.active = true;
+        this.assertions = this.failures = 0;
+        this.trigger('setup');
+        try {
+          // Pass the wrapper as the first argument to the test function.
+          if ((ok = typeof this.test == 'function')) this.test(this);
+        } catch (error) {
+          ok = false;
+          this.trigger({
+            'type': 'error',
+            'error': error
+          });
+        } finally {
+          if (!ok) this.done();
+        }
+      }
+      return this;
+    },
+
+    // Records an assertion and triggers the `assertion` event. The event object
+    // passed to each listener contains three additional properties: `actual` is
+    // the actual value passed to the assertion, `expected` is the expected value,
+    // and `message` is the assertion message.
+    'assert': function(actual, expected, message) {
+      // Only record the assertion if the test is running.
+      if (this.active) {
+        this.assertions++;
+        this.trigger({
+          'type': 'assertion',
+          'actual': actual,
+          'expected': expected,
+          'message': message
+        });
+      }
+      return this;
+    },
+
+    // The opposite of `.assert()`; records a failure and triggers the
+    // `failure` event.
+    'fail': function(actual, expected, message) {
+      if (this.active) {
+        this.failures++;
+        this.trigger({
+          'type': 'failure',
+          'actual': actual,
+          'expected': expected,
+          'message': message
+        });
+      }
+      return this;
+    },
+
+    // Tests whether `value` is truthy. To test strictly for the boolean `true`,
+    // use `.equal()` instead. The optional assertion `message` is passed to each
+    // event listener, and defaults to the name of the assertion (e.g., `ok`).
+    'ok': function(value, message) {
+      return this[value ? 'assert' : 'fail'](value, true, message != null ? message : 'ok');
+    },
+
+    // Tests whether `actual` is **identical** to `expected`, as determined by the `===` operator.
+    'equal': function(actual, expected, message) {
+      return this[actual === expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'equal');
+    },
+
+    // Tests for **strict** inequality (`actual !== expected`).
+    'notEqual': function(actual, expected, message) {
+      return this[actual !== expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notEqual');
+    },
+
+    // Tests for **loose** inequality (`actual != expected`).
+    'looseEqual': function(actual, expected, message) {
+      return this[actual == expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'looseEqual');
+    },
+
+    // Tests for **loose** inequality (`actual != expected`).
+    'notLooseEqual': function(actual, expected, message) {
+      return this[actual != expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notLooseEqual');
+    },
+
+    // Tests for deep equality and equivalence, as determined by the `eq()` function.
+    'deepEqual': function(actual, expected, message) {
+      return this[eq(actual, expected, []) ? 'assert' : 'fail'](actual, expected, message != null ? message : 'deepEqual');
+    },
+
+    // Tests for deep inequality.
+    'notDeepEqual': function(actual, expected, message) {
+      return this[eq(actual, expected, []) ? 'fail' : 'assert'](actual, expected, message != null ? message : 'notDeepEqual');
+    },
+
+    // Tests whether the function `block` throws an error. Both `expected` and
+    // `message` are optional; if the `message` is omitted and `expected` is not
+    // a RegExp or validation function, the value of `expected` is used as the message.
+    'raises': function(block, expected, message) {
+      var ok = false, isFunction = typeof expected == 'function', isRegExp = expected && toString.call(expected) == '[object RegExp]';
+      // The message was passed as the second argument.
+      if (!isFunction && !isRegExp && message == null) {
+        message = expected;
+        expected = null;
+      }
+      if (typeof block == 'function') {
+        try {
+          block();
+        } catch (error) {
+          ok = expected == null;
+          if (isRegExp) {
+            ok = expected.test(error);
+          } else if (isFunction) {
+            // Pass the error as the first argument to the validation function.
+            ok = expected.call(this, error, this);
+          }
+        }
+      }
+      return this.ok(ok, message != null ? message : 'raises');
+    },
+
+    // Completes a test with an optional expected number of `assertions`. This
+    // method **must** be called at the end of each test.
+    'done': function(assertions) {
+      if (this.active) {
+        // Avoid race conditions.
+        this.active = false;
+        // Verify that the expected number of assertions were executed.
+        if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
+        this.trigger('teardown');
+      }
+      return this;
+    }
+  };
+
   // Custom Events
   // -------------
 
   // Methods for adding, removing, and firing custom events. You can `bind` and
   // `unbind` event listeners; `trigger`-ing an event executes its listeners in
   // succession.
-  Spec.Events = function() {};
 
   // Binds an event listener. The `listener` will be invoked each time the event
   // `type`, specified by a string identifier, is fired. Listeners bound to the `all`
   // event will be invoked when *any* event is triggered; listeners bound to the
   // `error` event will be invoked when a triggered listener throws an error.
-  Spec.Events.prototype.bind = function(type, listener) {
+  Spec.prototype.bind = Spec.Test.prototype.bind = function(type, listener) {
     // Create the event registry if it doesn't exist.
     var events = typeof this.events == 'object' && this.events || (this.events = {});
     // Add the event listener to the listener registry.
@@ -108,7 +322,7 @@
   // Removes a previously-bound event listener. If the `listener` function is omitted,
   // all listeners for the event `type` will be removed. If both the event and listener
   // are omitted, *all* event listeners will be removed.
-  Spec.Events.prototype.unbind = function(type, listener) {
+  Spec.prototype.unbind = Spec.Test.prototype.unbind = function(type, listener) {
     var events = this.events, listeners, length;
     if (typeof events == 'object' && events) {
       if (type == null && listener == null) {
@@ -126,7 +340,7 @@
 
   // Triggers an event, specified by either a string identifier or an event
   // object with a `type` property.
-  Spec.Events.prototype.trigger = function(event) {
+  Spec.prototype.trigger = Spec.Test.prototype.trigger = function(event) {
     var events = this.events, type, listeners, listener, index, length;
     if (event != null && typeof events == 'object' && events) {
       // Convert a string identifier into an event object.
@@ -170,225 +384,6 @@
           }
         }
       }
-    }
-    return this;
-  };
-
-  // Specs
-  // -----
-
-  // Add support for custom events.
-  Spec.prototype = new Spec.Events();
-  Spec.prototype.constructor = Spec;
-  
-  Spec.prototype.name = 'Anonymous Spec';
-
-  // Adds a new `test` function to the spec. The test `name` is optional.
-  Spec.prototype.add = function(name, test) {
-    this.push(new Spec.Test(name, test));
-    return this;
-  };
-  
-  // Array methods.
-  Spec.prototype.pop = [].pop;
-  Spec.prototype.push = [].push;
-  Spec.prototype.reverse = [].reverse;
-  Spec.prototype.shift = [].shift;
-  Spec.prototype.sort = [].sort;
-  Spec.prototype.unshift = [].unshift;
-
-  // Successively runs each test in the spec.
-  Spec.prototype.run = function() {
-    var spec = this, onTestEvent, index, length;
-    if (!spec.active) {
-      // Avoid race conditions caused by multiple invocations.
-      spec.active = true;
-      // Create the aggregate spec summary.
-      spec.assertions = spec.failures = 0;
-      // Internal method called every time a test triggers an event.
-      onTestEvent = function(event) {
-        var test = event.target, type = event.type;
-        // Proxy the triggered event.
-        spec.trigger(event);
-        switch (type) {
-          // Update the spec summary.
-          case 'assertion':
-            spec.assertions++;
-            break;
-          case 'failure':
-            spec.failures++;
-            break;
-          case 'teardown':
-            // Unbind the helper event listener.
-            test.unbind('all', onTestEvent);
-            // Remove the completed test and run the next test.
-            if ((test = spec.shift()) && typeof test.run == 'function') {
-              test.run();
-            } else {
-              // Ensure that the spec is empty.
-              if (!spec.length) delete spec[0];
-              // Finish running the spec.
-              spec.active = false;
-              spec.trigger('complete');
-            }
-        }
-      };
-      // Bind the helper event listener and run the tests.
-      for (index = 0, length = spec.length; index < length; index++) spec[index].bind('all', onTestEvent);
-      spec.trigger('start').shift().run();
-    }
-    return spec;
-  };
-
-  // Tests
-  // -----
-
-  // Wraps a `test` function with several convenience methods and assertions. The
-  // test `name` is optional.
-  Spec.Test = function(name, test) {
-    if (typeof name == 'function' && test == null) {
-      test = name;
-    } else if (name != null) {
-      this.name = name;
-    }
-    this.test = typeof test == 'function' ? test : null;
-  };
-
-  // Add support for custom events.
-  Spec.Test.prototype = new Spec.Events();
-  Spec.Test.prototype.constructor = Spec.Test;
-  
-  Spec.Test.prototype.name = 'Anonymous Test';
-
-  // Runs the test.
-  Spec.Test.prototype.run = function() {
-    var ok;
-    if (!this.active) {
-      // Avoid race conditions.
-      this.active = true;
-      this.assertions = this.failures = 0;
-      this.trigger('setup');
-      try {
-        // Pass the wrapper as the first argument to the test function.
-        if ((ok = typeof this.test == 'function')) this.test(this);
-      } catch (error) {
-        ok = false;
-        this.trigger({
-          'type': 'error',
-          'error': error
-        });
-      } finally {
-        if (!ok) this.done();
-      }
-    }
-    return this;
-  };
-
-  // Records an assertion and triggers the `assertion` event. The event object
-  // passed to each listener contains three additional properties: `actual` is
-  // the actual value passed to the assertion, `expected` is the expected value,
-  // and `message` is the assertion message.
-  Spec.Test.prototype.assert = function(actual, expected, message) {
-    // Only record the assertion if the test is running.
-    if (this.active) {
-      this.assertions++;
-      this.trigger({
-        'type': 'assertion',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
-    }
-    return this;
-  };
-
-  // The opposite of `.assert()`; records a failure and triggers the
-  // `failure` event.
-  Spec.Test.prototype.fail = function(actual, expected, message) {
-    if (this.active) {
-      this.failures++;
-      this.trigger({
-        'type': 'failure',
-        'actual': actual,
-        'expected': expected,
-        'message': message
-      });
-    }
-    return this;
-  };
-
-  // Tests whether `value` is truthy. To test strictly for the boolean `true`,
-  // use `.equal()` instead. The optional assertion `message` is passed to each
-  // event listener, and defaults to the name of the assertion (e.g., `ok`).
-  Spec.Test.prototype.ok = function(value, message) {
-    return this[value ? 'assert' : 'fail'](value, true, message != null ? message : 'ok');
-  };
-
-  // Tests whether `actual` is **identical** to `expected`, as determined by the `===` operator.
-  Spec.Test.prototype.equal = function(actual, expected, message) {
-    return this[actual === expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'equal');
-  };
-
-  // Tests for **strict** inequality (`actual !== expected`).
-  Spec.Test.prototype.notEqual = function(actual, expected, message) {
-    return this[actual !== expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notEqual');
-  };
-
-  // Tests for **loose** or coercive equality (`actual == expected`).
-  Spec.Test.prototype.looseEqual = function(actual, expected, message) {
-    return this[actual == expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'looseEqual');
-  };
-
-  // Tests for **loose** inequality (`actual != expected`).
-  Spec.Test.prototype.notLooseEqual = function(actual, expected, message) {
-    return this[actual != expected ? 'assert' : 'fail'](actual, expected, message != null ? message : 'notLooseEqual');
-  };
-
-  // Tests for deep equality and equivalence, as determined by the `eq()` function.
-  Spec.Test.prototype.deepEqual = function(actual, expected, message) {
-    return this[eq(actual, expected, []) ? 'assert' : 'fail'](actual, expected, message != null ? message : 'deepEqual');
-  };
-
-  // Tests for deep inequality.
-  Spec.Test.prototype.notDeepEqual = function(actual, expected, message) {
-    return this[eq(actual, expected, []) ? 'fail' : 'assert'](actual, expected, message != null ? message : 'notDeepEqual');
-  };
-
-  // Tests whether the function `block` throws an error. Both `expected` and
-  // `message` are optional; if the `message` is omitted and `expected` is not
-  // a RegExp or validation function, the value of `expected` is used as the message.
-  Spec.Test.prototype.raises = function(block, expected, message) {
-    var ok = false, isFunction = typeof expected == 'function', isRegExp = expected && toString.call(expected) == '[object RegExp]';
-    // The message was passed as the second argument.
-    if (!isFunction && !isRegExp && message == null) {
-      message = expected;
-      expected = null;
-    }
-    if (typeof block == 'function') {
-      try {
-        block();
-      } catch (error) {
-        ok = expected == null;
-        if (isRegExp) {
-          ok = expected.test(error);
-        } else if (isFunction) {
-          // Pass the error as the first argument to the validation function.
-          ok = expected.call(this, error, this);
-        }
-      }
-    }
-    return this.ok(ok, message != null ? message : 'raises');
-  };
-
-  // Completes a test with an optional expected number of `assertions`. This
-  // method **must** be called at the end of each test.
-  Spec.Test.prototype.done = function(assertions) {
-    if (this.active) {
-      // Avoid race conditions.
-      this.active = false;
-      // Verify that the expected number of assertions were executed.
-      if (typeof assertions == 'number' && assertions > -1 && (assertions = Math.ceil(assertions)) != this.assertions) this.fail(this.assertions, assertions, 'done');
-      this.trigger('teardown');
     }
     return this;
   };
