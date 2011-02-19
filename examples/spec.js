@@ -145,13 +145,12 @@
 
   spec.bind('teardown', function(event) {
     // `teardown` is triggered at the end of each test.
-    var test = event.target;
-    console.log('Finished test `' + test.name + '`. ' + test.assertions + ' assertions, ' + test.failures + ' failures.');
+    console.log('Finished test `' + event.target.name + '`. ' + event.target.assertions + ' assertions, ' + event.target.failures + ' failures, ' + event.target.errors + ' errors.');
   });
 
-  spec.bind('complete', function(event) {
+  spec.bind('complete', function() {
     // `complete` is triggered once all tests have finished running.
-    console.log('Finished spec `' + event.target.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures.');
+    console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });
 
   spec.add('ajax', function(test) {

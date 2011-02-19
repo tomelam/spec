@@ -17,7 +17,7 @@
 
   // Creates a new spec. The spec `name` is optional.
   Spec = this.Spec = function(name) {
-    if (name != null) this.name = name;
+    this.name = typeof name == 'string' && name || 'Anonymous Spec';
   },
 
   // Internal method; recursively compares two objects.
@@ -87,7 +87,6 @@
   // Specs
   // -----
 
-  // Methods for extending and running specs. A spec is a collection of related unit tests.
   Spec.prototype = {
     'constructor': Spec,
 
@@ -109,7 +108,7 @@
     'run': function() {
       var spec = this, onTestEvent, index, length;
       // Create the aggregate spec summary.
-      spec.assertions = spec.failures = 0;
+      spec.assertions = spec.failures = spec.errors = 0;
       // Internal method called every time a test triggers an event.
       onTestEvent = function(event) {
         var test = event.target, type = event.type;
@@ -119,6 +118,7 @@
           // Update the spec summary.
           spec.assertions += test.assertions;
           spec.failures += test.failures;
+          spec.errors += test.errors;
           // Unbind the helper event listener.
           test.unbind('all', onTestEvent);
           // Remove the completed test and run the next test.
@@ -147,8 +147,8 @@
   Spec.Test = function(name, test) {
     if (typeof name == 'function' && test == null) {
       test = name;
-    } else if (name != null) {
-      this.name = name;
+    } else {
+      this.name = typeof name == 'string' && name || 'Anonymous Test';
     }
     this.test = typeof test == 'function' ? test : null;
   };
@@ -158,19 +158,21 @@
 
     // Runs the test.
     'run': function() {
-      var ok;
-      this.assertions = this.failures = 0;
+      var ok = typeof this.test == 'function';
+      this.assertions = this.failures = this.errors = 0;
       this.trigger('setup');
       try {
         // Pass the wrapper as the first argument to the test function.
-        if ((ok = typeof this.test == 'function')) this.test(this);
+        if (ok) this.test(this);
       } catch (error) {
         ok = false;
+        this.errors++;
         this.trigger({
           'type': 'error',
           'error': error
         });
       } finally {
+        // Invalid test function or error; finish running the test.
         if (!ok) this.done();
       }
       return this;
@@ -244,7 +246,7 @@
     // `message` are optional; if the `message` is omitted and `expected` is not
     // a RegExp or validation function, the value of `expected` is used as the message.
     'raises': function(block, expected, message) {
-      var ok = false, isFunction = typeof expected == 'function', isRegExp = expected && toString.call(expected) == '[object RegExp]';
+      var ok = false, isRegExp = expected && toString.call(expected) == '[object RegExp]', isFunction = !isRegExp && typeof expected == 'function';
       // The message was passed as the second argument.
       if (!isFunction && !isRegExp && message == null) {
         message = expected;
@@ -254,12 +256,14 @@
         try {
           block();
         } catch (error) {
-          ok = expected == null;
-          if (isRegExp) {
-            ok = expected.test(error);
-          } else if (isFunction) {
-            // Pass the error as the first argument to the validation function.
-            ok = expected.call(this, error, this);
+          if (expected == null || (isRegExp && expected.test(error)) || (isFunction && expected.call(this, error, this))) {
+            ok = true;
+          } else {
+            this.errors++;
+            return this.trigger({
+              'type': 'error',
+              'error': error
+            });
           }
         }
       }
