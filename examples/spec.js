@@ -1,7 +1,7 @@
 (function() {
 
   // Create a new spec.
-  var spec = Spec('Miniatures Unit Tests'), escapable, escapes, quote, serialize, stringify = typeof JSON == 'object' && JSON && JSON.stringify, toString = Object.prototype.toString;
+  var spec = new Spec('Miniatures Unit Tests'), escapable, escapes, quote, serialize, stringify = typeof JSON == 'object' && JSON && JSON.stringify, toString = Object.prototype.toString;
 
   // ECMAScript 5-compliant `JSON.stringify` fallback.
   if (typeof stringify != 'function' || stringify(void 0) !== void 0) {

@@ -17,7 +17,8 @@
 
   // Creates a new **spec**. A spec is a collection of related unit tests.
   Spec = this.Spec = function(name) {
-    return new Spec.prototype.constructor(name);
+    // The spec name is optional.
+    if (name != null) this.name = name;
   },
 
   // Internal method; recursively compares two objects.
@@ -178,11 +179,7 @@
 
   // Add support for custom events.
   Spec.prototype = new Spec.Events();
-  
-  // Creates a new spec. The spec `name` is optional.
-  (Spec.prototype.constructor = function(name) {
-    if (name != null) this.name = name;
-  }).prototype = Spec.prototype;
+  Spec.prototype.constructor = Spec;
   
   Spec.prototype.name = 'Anonymous Spec';
 
