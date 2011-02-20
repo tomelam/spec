@@ -377,7 +377,7 @@
       type = event.type;
       // Capture a reference to the current event target.
       if (!('target' in event)) event.target = this;
-      if ((listeners = typeof type == 'string' && type != 'all' && events[type]) && (length = listeners.length)) {
+      if ((listeners = typeof type == 'string' && events[type]) && (length = listeners.length)) {
         // Clone the event listener registry.
         listeners = listeners.slice(0);
         // Execute each event listener.
@@ -395,7 +395,7 @@
         }
       }
       // Trigger the special `all` event.
-      if ((listeners = events.all) && (length = listeners.length)) {
+      if (type != 'all' && (listeners = events.all) && (length = listeners.length)) {
         listeners = listeners.slice(0);
         for (index = 0; index < length; index++) {
           if (typeof (listener = index in listeners && listeners[index]) == 'function') {
