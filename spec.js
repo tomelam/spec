@@ -11,25 +11,25 @@
 (function() {
   // Specs
   // -----
-  
+
   // Specs are event-driven collections of related unit tests. Using custom
   // events, you can create routines for setting up and tearing down tests,
   // handling assertions, failures, and errors, and logging test results.
-  
+
   // Creates a new spec. The `name` is optional.
   function Spec(name) {
     this.name = typeof name == 'string' && name || 'Anonymous Spec';
   }
-  
+
   // The current version of Spec. Keep in sync with `package.json`.
   Spec.version = '1.0.0rc1';
-  
+
   // Adds a new `test` function to the spec. The `name` is optional.
   Spec.prototype.add = function(name, test) {
     this.push(new Spec.Test(name, test));
     return this;
   };
-  
+
   // Successively runs each test in the spec.
   Spec.prototype.run = function(name, test) {
     var spec = this, index, length;
@@ -63,7 +63,7 @@
     spec.trigger('start').shift().run();
     return spec;
   };
-  
+
   // Array methods.
   Spec.prototype.pop = [].pop;
   Spec.prototype.push = [].push;
@@ -71,10 +71,10 @@
   Spec.prototype.shift = [].shift;
   Spec.prototype.sort = [].sort;
   Spec.prototype.unshift = [].unshift;
-  
+
   // Tests
   // -----
-  
+
   // The internal `eq()` function recursively compares two objects. Based on
   // work by Jeremy Ashkenas, Philippe Rathe, and Mark Miller.
   var toString = {}.toString;
@@ -136,7 +136,7 @@
     }
     return false;
   }
-  
+
   // The `Spec.Test` constructor wraps a `test` function with several convenience
   // methods and assertions. The `name` is optional.
   Spec.Test = function(name, test) {
@@ -147,7 +147,7 @@
     }
     this.test = typeof test == 'function' ? test : null;
   };
-  
+
   // Runs the test.
   Spec.Test.prototype.run = function() {
     var ok = typeof this.test == 'function';
@@ -166,7 +166,7 @@
     }
     return this;
   };
-  
+
   // Tests whether `value` is truthy. To test strictly for the boolean `true`,
   // use `.equal()` instead. The optional assertion `message` is passed to each
   // event listener, and defaults to the name of the assertion (e.g., `ok`).
@@ -185,7 +185,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests whether `actual` is **identical** to `expected`, as determined by the `===` operator.
   Spec.Test.prototype.equal = function(actual, expected, message) {
     var event = {
@@ -202,7 +202,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests for **strict** inequality (`actual !== expected`).
   Spec.Test.prototype.notEqual = function(actual, expected, message) {
     var event = {
@@ -219,7 +219,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests for **loose** inequality (`actual != expected`).
   Spec.Test.prototype.looseEqual = function(actual, expected, message) {
     var event = {
@@ -236,7 +236,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests for **loose** inequality (`actual != expected`).
   Spec.Test.prototype.notLooseEqual = function(actual, expected, message) {
     var event = {
@@ -253,7 +253,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests for deep equality and equivalence, as determined by the `eq()` function.
   Spec.Test.prototype.deepEqual = function(actual, expected, message) {
     var event = {
@@ -270,7 +270,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests for deep inequality.
   Spec.Test.prototype.notDeepEqual = function(actual, expected, message) {
     var event = {
@@ -287,7 +287,7 @@
     }
     return this.trigger(event);
   };
-  
+
   // Tests whether the function `block` throws an error. Both `expected` and
   // `message` are optional; if the `message` is omitted and `expected` is not
   // a RegExp or validation function, the value of `expected` is used as the message.
@@ -312,7 +312,7 @@
     }
     return this.ok(ok, typeof message == 'string' && message || 'raises');
   };
-  
+
   // Completes a test with an optional expected number of `assertions`. This
   // method **must** be called at the end of each test.
   Spec.Test.prototype.done = function(assertions) {
@@ -410,7 +410,7 @@
     }
     return this;
   };
-  
+
   // Expose the `Spec` function.
   this.Spec = Spec;
 }).call(typeof exports == 'object' && exports || this);
