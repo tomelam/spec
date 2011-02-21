@@ -1,29 +1,39 @@
 Spec
 ====
 
-**Spec** is a JavaScript unit testing library. It provides several convenience methods for writing unit tests, and includes an event-driven test runner. This allows you to create custom routines for setting up and tearing down tests, handling assertions, failures, and errors, and logging test results.
+**Spec** is an event-driven unit testing library. It provides several convenience methods for writing unit tests, and includes a configurable test runner that allows you to create routines for setting up and tearing down tests, handling assertions, failures, and errors, and logging test results.
 
-Spec is environment and framework-agnostic: it has no external dependencies, and is compatible with web browsers, [CommonJS](http://www.commonjs.org/) implementations, and JavaScript engines. It is also capable of testing both synchronous and asynchronous code.
+Spec is environment and framework-agnostic: it has no external dependencies, and is compatible with web browsers, [CommonJS](http://www.commonjs.org/) environments, and JavaScript engines. It is also capable of testing both synchronous and asynchronous code.
 
-The [annotated source code](http://kitgoncharov.github.com/Spec/docs/spec.html) and [example spec](http://kitgoncharov.github.com/Spec/examples/spec.html) are available for your perusal.
+## Downloads
 
-## Using Spec
+- [JavaScript Version](http://kitgoncharov.github.com/Spec/lib/spec.js)
+- [CoffeeScript Version](http://kitgoncharov.github.com/Spec/lib/spec.coffee)
 
-You can either [**download** the latest version](http://kitgoncharov.github.com/Spec/spec.js) of Spec from GitHub, or **install** it via [npm](http://npmjs.org):
+You can also install the latest version of Spec using [npm](http://npmjs.org), the Node Package Manager:
 
     $ npm install spec
 
+### Annotated Source Code
+
+- [JavaScript Version](http://kitgoncharov.github.com/Spec/docs/spec.js.html)
+- [CoffeeScript Version](http://kitgoncharov.github.com/Spec/docs/spec.coffee.html)
+
+An [example spec](http://kitgoncharov.github.com/Spec/examples/spec.html) is also included for your perusal.
+
+## Compatibility
+
+Spec has been tested with the following web browsers, CommonJS environments, and JavaScript engines.
+
 ### Web Browsers
 
-Spec has been tested with the following web browsers:
-
-* Microsoft [Internet Explorer](http://www.microsoft.com/windows/internet-explorer) for Windows, version 5.5 and higher
-* Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.5 and higher
-* Apple [Safari](http://www.apple.com/safari), version 2.0 and higher
-* Google [Chrome](http://www.google.com/chrome), version 1.0 and higher
-* [Opera](http://www.opera.com) 7.54 and higher
-* [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
-* [Konqueror](http://www.konqueror.org) 3.4.3 and higher
+- Microsoft [Internet Explorer](http://www.microsoft.com/windows/internet-explorer) for Windows, version 5.5 and higher
+- Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.5 and higher
+- Apple [Safari](http://www.apple.com/safari), version 2.0 and higher
+- Google [Chrome](http://www.google.com/chrome), version 1.0 and higher
+- [Opera](http://www.opera.com) 7.54 and higher
+- [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
+- [Konqueror](http://www.konqueror.org) 3.4.3 and higher
 
 #### Example
 
@@ -50,13 +60,11 @@ Spec has been tested with the following web browsers:
       </body>
     </html>
 
-### CommonJS Implementations
+### CommonJS Environments
 
-Spec has been tested with the following CommonJS implementations:
-
-* [Node](http://nodejs.org/) 0.2.6 and higher
-* [Narwhal](http://narwhaljs.org/) 0.3.2 and higher
-* [RingoJS](http://ringojs.org/) 0.4 and higher
+- [Node](http://nodejs.org/) 0.2.6 and higher
+- [Narwhal](http://narwhaljs.org/) 0.3.2 and higher
+- [RingoJS](http://ringojs.org/) 0.4 and higher
 
 #### Example
 
@@ -73,12 +81,10 @@ Spec has been tested with the following CommonJS implementations:
 
 ### JavaScript Engines
 
-Spec has been tested with the following JavaScript engines:
-
-* Mozilla [SpiderMonkey](http://www.mozilla.org/js/spidermonkey), version 1.5.0 and higher
-* Mozilla [Rhino](http://www.mozilla.org/rhino) 1.7R1 and higher
-* WebKit [JSC](https://trac.webkit.org/wiki/JSC)
-* Google [V8](http://code.google.com/p/v8)
+- Mozilla [SpiderMonkey](http://www.mozilla.org/js/spidermonkey), version 1.5.0 and higher
+- Mozilla [Rhino](http://www.mozilla.org/rhino) 1.7R1 and higher
+- WebKit [JSC](https://trac.webkit.org/wiki/JSC)
+- Google [V8](http://code.google.com/p/v8)
 
 #### Example
 
@@ -110,14 +116,14 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 
 - **Spacing**: Use two spaces for indentation. No tabs.
 - **Naming**: Keep variable and method names concise but descriptive. `index` and `callback` are preferable to `i` and `fn`.
-- **Comments**: Significant changes and new methods should be annotated with single-line comments.
+- **Comments**: Significant changes and new methods should be annotated with comments.
 - **Performance**: Don't overuse abstractions or slow down critical code to add a feature of marginal utility.
-- **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). A configuration file is included in the repository; run `jsl -conf jsl.conf` from the command line to check the source code for problems.
+- **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). To check the source code for problems, you can run `jsl -conf jsl.conf` from the command line if you're working on the JavaScript version, or `coffee -l lib/spec.coffee` if you're working on the CoffeeScript version.
 
 ### Contributors
 
-* [John-David Dalton](http://allyoucanleet.com/)
-* [Mathias Bynens](http://mathiasbynens.be/)
+- [John-David Dalton](http://allyoucanleet.com/)
+- [Mathias Bynens](http://mathiasbynens.be/)
 
 ## MIT License
 

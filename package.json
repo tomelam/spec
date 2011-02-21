@@ -1,9 +1,9 @@
 {
   "name": "spec",
   "version": "1.0.0rc1",
-  "description": "An event-driven JavaScript unit testing library.",
+  "description": "An event-driven unit testing library for JavaScript and CoffeeScript.",
   "homepage": "http://github.com/kitgoncharov/Spec",
-  "main": "spec",
+  "main": "./lib/spec",
   "keywords": ["unit", "test", "testing", "event", "spec", "suite", "assert"],
   "licenses": [{
     "type": "MIT",
@@ -26,6 +26,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/kitgoncharov/Spec.git"
+    "url": "git://github.com/kitgoncharov/Spec.git"
   }
 }
