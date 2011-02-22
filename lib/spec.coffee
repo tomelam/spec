@@ -13,17 +13,16 @@
 # create routines for setting up and tearing down tests, handling assertions, failures,
 # and errors, and logging test results.
 
-(exports ? this).Spec = class Spec
+(exports ? this).Spec = class
   # The current version of Spec. Keep in sync with `package.json`.
   @version = '1.0.0rc1'
 
   # Creates a new spec. The `name` is optional.
-  constructor: (name) ->
-    @name = typeof name is 'string' and name or 'Anonymous Spec'
+  constructor: (name) -> @name = typeof name is 'string' and name or 'Anonymous Spec'
 
   # Adds a new `test` function to the spec. The `name` is optional.
   add: (name, test) ->
-    @push new Spec.Test(name, test)
+    @push new Test(name, test)
     @
 
   # Successively runs each test in the spec.
@@ -56,7 +55,7 @@
     @
 
   # Array methods.
-  pop: [].pop; push: [].push; reverse: [].reverse; shift: [].shift; sort: [].sort; unshift: [].unshift
+  {pop: @::pop, push: @::push, reverse: @::reverse, shift: @::shift, sort: @::sort, unshift: @::unshift} = []
 
   # Tests
   # -----
@@ -107,7 +106,7 @@
       return result
     false
 
-  @Test = class
+  @Test = class Test
     # The `Spec.Test` class wraps a `test` function with several convenience methods
     # and assertions. The `name` is optional.
     constructor: (name, test) ->
@@ -255,7 +254,7 @@
   # specified by a string identifier, is fired. Listeners bound to the `all` event will be
   # invoked when *any* event is triggered; listeners bound to the `error` event will be
   # invoked when a triggered listener throws an error.
-  Spec::bind = Spec.Test::bind = (type, listener) ->
+  @::bind = Test::bind = (type, listener) ->
     # Create the event registry if it doesn't exist.
     @events = {} unless typeof @events is 'object' and @events
     # Add the event listener to the listener registry.
@@ -265,7 +264,7 @@
   # Removes a previously-bound event listener. If the `listener` function is omitted, all
   # listeners for the event `type` will be removed. If both the event and listener are
   # omitted, *all* event listeners will be removed.
-  Spec::unbind = Spec.Test::unbind = (type, listener) ->
+  @::unbind = Test::unbind = (type, listener) ->
     if typeof @events is 'object' and @events
       # Remove all event listeners.
       @events = {} unless type? and listener?
@@ -278,7 +277,7 @@
 
   # Triggers an event, specified by either a string identifier or an event object with a
   # `type` property.
-  Spec::trigger = Spec.Test::trigger = (event) ->
+  @::trigger = Test::trigger = (event) ->
     isEvent = typeof event is 'object'
     if (isEvent or typeof event is 'string') and event and typeof @events is 'object' and @events
       # Convert a string identifier into an event object.
