@@ -62,14 +62,14 @@
 
   # The internal `eq()` function recursively compares two objects. Based on work by Jeremy
   # Ashkenas, Philippe Rathe, and Mark Miller.
-  toString = {}.toString
+  getClass = {}.toString
   eq = (left, right, stack) ->
     # Identical objects and values. `0 === -0`, but they aren't equal.
     return left isnt 0 or 1 / left is 1 / right if left is right
     # A strict comparison is necessary because `null == undefined`.
     return left is right unless left?
     # Compare `[[Class]]` names (see the ECMAScript 5 spec, section 15.2.4.2).
-    return false if (className = toString.call(left)) isnt toString.call(right)
+    return false if (className = getClass.call(left)) isnt getClass.call(right)
     switch className
       # Compare strings, numbers, dates, and booleans by value.
       when '[object String]' then return left + '' is right + ''
@@ -133,12 +133,22 @@
         @done() unless ok
       @
 
-    # Tests whether `value` is truthy. To test strictly for the boolean `true`, use
-    # `equal()` instead. The optional assertion `message` is passed to each event
-    # listener, and defaults to the name of the assertion (e.g., `ok`).
-    ok: (value, message) ->
-      event = actual: value, expected: true, message: typeof message is 'string' and message or 'ok'
-      if value
+    # Tests whether `expression` is truthy. The optional `data` argument may specify either
+    # an assertion message or an object with three properties: `actual` contains the actual
+    # value passed to the assertion, `expected` contains the expected value, and `message`
+    # contains the assertion message. The message defaults to the name of the current
+    # assertion (e.g., `ok`). You can use this method to create custom assertions.
+    ok: (expression, data) ->
+      event = actual: expression, expected: true
+      if typeof data is 'object' and data
+        # Convert a data object into an event object.
+        event.actual = data.actual if 'actual' of data
+        event.expected = data.expected if 'expected' of data
+        event.message = typeof data.message is 'string' and data.message or 'ok'
+      else
+        event.message = typeof data is 'string' and data or 'ok'
+      # Note: To test strictly for the boolean value `true`, use `equal()` instead.
+      if expression
         @assertions++
         event.type = 'assertion'
       else
@@ -148,77 +158,29 @@
 
     # Tests whether `actual` is **identical** to `expected`, as determined by the `is`
     # operator.
-    equal: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'equal'
-      if actual is expected
-        @assertions++
-        event.type = 'assertion'
-      else
-        @failures++
-        event.type = 'failure'
-      @trigger event
+    equal: (actual, expected, message) -> @ok actual is expected, actual: actual, expected: expected, message: typeof message is 'string' and message or 'equal'
 
     # Tests for **strict** inequality (`actual isnt expected`).
-    notEqual: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'notEqual'
-      if actual isnt expected
-        @assertions++
-        event.type = 'assertion'
-      else
-        @failures++
-        event.type = 'failure'
-      @trigger event
+    notEqual: (actual, expected, message) -> @ok actual isnt expected, actual: actual, expected: expected, message: typeof message is 'string' and message or 'notEqual'
 
     # Tests for loose or **coercive** equality (`actual == expected`).
-    looseEqual: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'looseEqual'
-      if `actual == expected`
-        @assertions++
-        event.type = 'assertion'
-      else
-        @failures++
-        event.type = 'failure'
-      @trigger event
+    looseEqual: (actual, expected, message) -> @ok `actual == expected`, actual: actual, expected: expected, message: typeof message is 'string' and message or 'looseEqual'
 
     # Tests for **loose** inequality (`actual != expected`).
-    notLooseEqual: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'notLooseEqual'
-      if `actual != expected`
-        @assertions++
-        event.type = 'assertion'
-      else
-        @failures++
-        event.type = 'failure'
-      @trigger event
+    notLooseEqual: (actual, expected, message) -> @ok `actual != expected`, actual: actual, expected: expected, message: typeof message is 'string' and message or 'notLooseEqual'
 
     # Tests for deep equality and equivalence, as determined by the `eq()` function.
-    deepEqual: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'deepEqual'
-      if eq actual, expected, []
-        @assertions++
-        event.type = 'assertion'
-      else
-        @failures++
-        event.type = 'failure'
-      @trigger event
+    deepEqual: (actual, expected, message) -> @ok eq(actual, expected, []), actual: actual, expected: expected, message: typeof message is 'string' and message or 'deepEqual'
 
     # Tests for deep inequality.
-    notDeepEqual: (actual, expected, message) ->
-      event = actual: actual, expected: expected, message: typeof message is 'string' and message or 'notDeepEqual'
-      if eq actual, expected, []
-        @failures++
-        event.type = 'failure'
-      else
-        @assertions++
-        event.type = 'assertion'
-      @trigger event
+    notDeepEqual: (actual, expected, message) -> @ok not eq(actual, expected, []), actual: actual, expected: expected, message: typeof message is 'string' and message or 'notDeepEqual'
 
     # Tests whether the function `block` throws an error. Both `expected` and `message`
     # are optional; if the `message` is omitted and `expected` is not a RegExp or
     # validation function, the `expected` value is used as the message.
     raises: (block, expected, message) ->
       ok = false
-      isRegExp = expected and toString.call(expected) is '[object RegExp]'
+      isRegExp = expected and getClass.call(expected) is '[object RegExp]'
       isFunction = not isRegExp and typeof expected is 'function'
       # The message was passed as the second argument.
       unless isFunction and isRegExp and message?
@@ -233,7 +195,7 @@
           else
             @errors++
             return @trigger type: 'error', error: error
-      @ok ok, typeof message is 'string' and message or 'raises'
+      @ok ok, actual: block, expected: expected, message: typeof message is 'string' and message or 'raises'
 
     # Completes a test with an optional expected number of `assertions`. This method
     # **must** be called at the end of each test.
