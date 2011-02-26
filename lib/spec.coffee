@@ -15,7 +15,7 @@
 
 (exports ? this).Spec = class
   # The current version of Spec. Keep in sync with `package.json`.
-  @version = '1.0.0rc1'
+  @version = '1.0.0rc2'
 
   # Creates a new spec. The `name` is optional.
   constructor: (name) -> @name = typeof name is 'string' and name or 'Anonymous Spec'
