@@ -139,14 +139,10 @@
     # contains the assertion message. The message defaults to the name of the current
     # assertion (e.g., `ok`). You can use this method to create custom assertions.
     ok: (expression, data) ->
-      event = actual: expression, expected: true
-      if typeof data is 'object' and data
-        # Convert a data object into an event object.
-        event.actual = data.actual if 'actual' of data
-        event.expected = data.expected if 'expected' of data
-        event.message = typeof data.message is 'string' and data.message or 'ok'
-      else
-        event.message = typeof data is 'string' and data or 'ok'
+      isData = typeof data is 'object' and data
+      # Convert a data object into an event object.
+      event = actual: (if isData and 'actual' of data then data.actual else expression), expected: (if isData and 'expected' of data then data.expected else true), message: (if isData then data.message else data)
+      event.message = 'ok' unless typeof event.message is 'string' and event.message
       # Note: To test strictly for the boolean value `true`, use `equal()` instead.
       if expression
         @assertions++
