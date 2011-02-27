@@ -117,38 +117,38 @@
     };
   }
 
-  // Bind the event handlers.
-  spec.bind('start', function() {
+  // Attach the event listeners.
+  spec.on('start', function() {
     // `start` is triggered before any tests are run.
     console.log('Started spec `' + this.name + '`.');
   });
 
-  spec.bind('setup', function(event) {
+  spec.on('setup', function(event) {
     // `setup` is triggered at the start of each test.
     console.log('Started test `' + event.target.name + '`.');
   });
 
-  spec.bind('assertion', function(event) {
+  spec.on('assertion', function(event) {
     // `assertion` is triggered when an assertion succeeds.
     console.log('Assertion: ' + event.message + '.');
   });
 
-  spec.bind('failure', function(event) {
+  spec.on('failure', function(event) {
     // `failure` is triggered when an assertion fails.
     console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
   });
 
-  spec.bind('error', function(event) {
+  spec.on('error', function(event) {
     // `error` is triggered when a test throws an error.
     console.log('Error: ' + stringify(event.error));
   });
 
-  spec.bind('teardown', function(event) {
+  spec.on('teardown', function(event) {
     // `teardown` is triggered at the end of each test.
     console.log('Finished test `' + event.target.name + '`. ' + event.target.assertions + ' assertions, ' + event.target.failures + ' failures, ' + event.target.errors + ' errors.');
   });
 
-  spec.bind('complete', function() {
+  spec.on('complete', function() {
     // `complete` is triggered once all tests have finished running.
     console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });

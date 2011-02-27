@@ -47,7 +47,7 @@ Spec has been tested with the following web browsers, CommonJS environments, and
         <script src="/path/to/spec.js"></script>
         <script>
           var spec = Spec('Sample Spec');
-          spec.bind('start', function() {
+          spec.on('start', function() {
             // ...
           });
           // ...
@@ -69,7 +69,7 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 #### Example
 
     var Spec = require('spec').Spec, spec = Spec('Sample Spec');
-    spec.bind('start', function() {
+    spec.on('start', function() {
       // ...
     });
     // ...
@@ -90,7 +90,7 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 
     load('/path/to/spec.js');
     var spec = Spec('Sample Spec');
-    spec.bind('start', function() {
+    spec.on('start', function() {
       // ...
     });
     // ...

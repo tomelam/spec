@@ -39,8 +39,8 @@
         @assertions += target.assertions
         @failures += target.failures
         @errors += target.errors
-        # Unbind the helper event listener.
-        @unbind 'all', onTestEvent
+        # Remove the helper event listener.
+        @detach 'all', onTestEvent
         # Remove the completed test and run the next test.
         if (target = @shift()) and typeof target.run is 'function'
           target.run()
@@ -49,8 +49,8 @@
           delete @[0] unless @length
           # Finish running the spec.
           @trigger 'complete'
-    # Bind the helper event listener and run the tests.
-    test.bind('all', onTestEvent) for test in @
+    # Attach the helper event listener and run the tests.
+    test.on('all', onTestEvent) for test in @
     @trigger('start').shift().run()
     @
 
@@ -202,24 +202,24 @@
   # Custom Events
   # -------------
 
-  # Methods for adding, removing, and firing custom events. You can `bind` and `unbind`
-  # event listeners; `trigger`-ing an event executes its listeners in succession.
+  # Methods for adding, removing, and firing custom events. You can add and remove event
+  # listeners; triggering an event executes its listeners in succession.
 
-  # Binds an event listener. The `listener` will be invoked each time the event `type`,
-  # specified by a string identifier, is fired. Listeners bound to the `all` event will be
-  # invoked when *any* event is triggered; listeners bound to the `error` event will be
-  # invoked when a triggered listener throws an error.
-  @::bind = Test::bind = (type, listener) ->
+  # Adds an event listener. The `listener` will be invoked each time the event `type`,
+  # specified by a string identifier, is fired. Listeners attached to the `all` event
+  # will be invoked when *any* event is triggered, while those attached to the `error`
+  # event will be invoked when a triggered listener throws an error.
+  @::on = Test::on = (type, listener) ->
     # Create the event registry if it doesn't exist.
     @events = {} unless typeof @events is 'object' and @events
     # Add the event listener to the listener registry.
     (@events[type] ||= []).push listener if typeof type is 'string' and type and typeof listener is 'function'
     @
 
-  # Removes a previously-bound event listener. If the `listener` function is omitted, all
-  # listeners for the event `type` will be removed. If both the event and listener are
-  # omitted, *all* event listeners will be removed.
-  @::unbind = Test::unbind = (type, listener) ->
+  # Removes a previously-attached event listener. If the `listener` function is omitted,
+  # all listeners for the event `type` will be removed. If both the event and listener
+  # are omitted, *all* event listeners will be removed.
+  @::detach = Test::detach = (type, listener) ->
     if typeof @events is 'object' and @events
       # Remove all event listeners.
       @events = {} unless type? and listener?
@@ -251,7 +251,7 @@
             break if listener.call(@, event) is false
           catch error
             # Trigger the `error` event if a listener throws an error.
-            return (@trigger type: 'error', error: error) if type isnt error and @events.error and @events.error.length
+            return (@trigger type: 'error', error: error) if type isnt 'error' and @events.error and @events.error.length
       # Trigger the special `all` event.
       if type isnt 'all' and (listeners = @events.all)
         listeners = listeners.slice 0
@@ -259,5 +259,5 @@
           try
             break if listener.call(@, event) is false
           catch error
-            return (@trigger type: 'error', error: error) if type isnt error and @events.error and @events.error.length
+            return (@trigger type: 'error', error: error) if type isnt 'error' and @events.error and @events.error.length
     @

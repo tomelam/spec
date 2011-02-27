@@ -20,34 +20,34 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
     // ...
   }
 
-  // Bind the event handlers.
-  Tests.bind('start', function() {
+  // Attach the event listeners.
+  Tests.on('start', function() {
     // Triggered before any tests are run.
     console.log('Started spec `' + this.name + '`.');
-  }).bind('setup', function(event) {
+  }).on('setup', function(event) {
     // Triggered at the start of each test.
     console.log('Started test `' + event.target.name + '`.');
-  }).bind('assertion', function(event) {
+  }).on('assertion', function(event) {
     // Triggered when a test assertion succeeds.
     console.log('Assertion: ' + event.message + '.');
-  }).bind('failure', function(event) {
+  }).on('failure', function(event) {
     // Triggered when an assertion fails.
     console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
-  }).bind('error', function(event) {
+  }).on('error', function(event) {
     // Triggered when a test or an event listener throws an error.
     console.log('Error: ' + stringify(event.error));
-  }).bind('teardown', function(event) {
+  }).on('teardown', function(event) {
     // Triggered at the end of each test.
     console.log('Finished test `' + event.target.name + '`. ' + event.target.assertions + ' assertions, ' + event.target.failures + ' failures, ' + event.target.errors + ' errors.');
-  }).bind('complete', function() {
+  }).on('complete', function() {
     // Triggered once all tests have finished running.
     console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });
 
-  Tests.add('Spec::bind', function() {
+  Tests.add('Spec::on', function() {
     // ...
     this.done(0);
-  }).add('Spec::unbind', function() {
+  }).add('Spec::detach', function() {
     // ...
     this.done(0);
   }).add('Spec::trigger', function() {
@@ -94,10 +94,10 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
   }).add('Test::done', function() {
     // ...
     this.done(0);
-  }).add('Test::bind', function() {
+  }).add('Test::on', function() {
     // ...
     this.done(0);
-  }).add('Test::unbind', function() {
+  }).add('Test::detach', function() {
     // ...
     this.done(0);
   }).add('Test::trigger', function() {
