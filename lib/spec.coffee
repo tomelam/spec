@@ -14,11 +14,11 @@
 # and errors, and logging test results.
 
 (exports ? this).Spec = class
-  # The current version of Spec. Keep in sync with `package.json`.
-  @version = '1.0.0rc2'
-
   # Creates a new spec. The `name` is optional.
   constructor: (name) -> @name = typeof name is 'string' and name or 'Anonymous Spec'
+
+  # The current version of Spec. Keep in sync with `package.json`.
+  @version = '1.0.0rc2'
 
   # Adds a new `test` function to the spec. The `name` is optional.
   add: (name, test) ->
@@ -39,17 +39,17 @@
         @assertions += target.assertions
         @failures += target.failures
         @errors += target.errors
-        # Remove the helper event listener.
+        # Remove the internal event listener.
         @detach 'all', onTestEvent
         # Remove the completed test and run the next test.
-        if (target = @shift()) and typeof target.run is 'function'
+        if (target = @shift())
           target.run()
         else
           # Ensure that the spec is empty.
           delete @[0] unless @length
           # Finish running the spec.
           @trigger 'complete'
-    # Attach the helper event listener and run the tests.
+    # Attach the internal event listener and begin running the tests.
     test.on('all', onTestEvent) for test in @
     @trigger('start').shift().run()
     @
@@ -64,12 +64,12 @@
   # Ashkenas, Philippe Rathe, and Mark Miller.
   getClass = {}.toString
   eq = (left, right, stack) ->
-    # Identical objects and values. `0 === -0`, but they aren't equal.
+    # Identical objects and values. `0 is -0`, but they aren't equal.
     return left isnt 0 or 1 / left is 1 / right if left is right
     # A strict comparison is necessary because `null == undefined`.
     return left is right unless left?
     # Compare `[[Class]]` names (see the ECMAScript 5 spec, section 15.2.4.2).
-    return false if (className = getClass.call(left)) isnt getClass.call(right)
+    return false unless (className = getClass.call(left)) is getClass.call(right)
     switch className
       # Compare strings, numbers, dates, and booleans by value.
       when '[object String]' then return left + '' is right + ''
@@ -83,7 +83,7 @@
       # Compare functions.
       when '[object Function]' then return left is right
       # Compare array lengths to determine if a deep comparison is necessary.
-      when '[object Array]' then return false if left.length isnt right.length
+      when '[object Array]' then return false unless left.length is right.length
     # Recursively compare objects and arrays.
     if typeof left is 'object'
       # Assume equality for cyclic structures.
@@ -99,7 +99,7 @@
       # Ensure that both objects have the same number of properties.
       if result
         # Break as soon as the expected number of properties is greater.
-        break for key of right when ++sizeRight > size
+        break for property of right when ++sizeRight > size
         result = size is sizeRight
       # Remove the object from the stack once the comparison is complete.
       stack.pop()
@@ -139,7 +139,8 @@
     # actual and expected values passed to the assertion, respectively, allowing you to
     # create custom assertions.
     ok: (expression, message, actual, expected) ->
-      event = actual: (if 2 of arguments then actual else expression), expected: (if 3 of arguments then expected else true), message: typeof message is 'string' and message or 'ok'
+      length = arguments.length
+      event = actual: (if length > 2 then actual else expression), expected: (if length > 3 then expected else true), message: typeof message is 'string' and message or 'ok'
       # Note: To test strictly for the boolean value `true`, use `equal()` instead.
       if expression
         @assertions++
@@ -176,7 +177,7 @@
       isRegExp = expected and getClass.call(expected) is '[object RegExp]'
       isFunction = not isRegExp and typeof expected is 'function'
       # The message was passed as the second argument.
-      unless isFunction and isRegExp and message?
+      if not isFunction and not isRegExp and not message?
         message = expected
         expected = null
       if typeof block is 'function'
@@ -192,11 +193,9 @@
 
     # Completes a test with an optional expected number of `assertions`. This method
     # **must** be called at the end of each test.
-    done: (assertions) ->
+    done: (assertions, message) ->
       # Verify that the expected number of assertions were executed.
-      if typeof assertions is 'number' and assertions > -1 and (assertions = Math.ceil(assertions)) isnt @assertions
-        @failures++
-        @trigger type: 'failure', actual: @assertions, expected: assertions, message: 'done'
+      @ok(@assertions is assertions, typeof message is 'string' and message or 'done', @assertions, assertions) if typeof assertions is 'number'
       @trigger 'teardown'
 
   # Custom Events
@@ -211,36 +210,35 @@
   # event will be invoked when a triggered listener throws an error.
   @::on = Test::on = (type, listener) ->
     # Create the event registry if it doesn't exist.
-    @events = {} unless typeof @events is 'object' and @events
+    @events ||= {}
     # Add the event listener to the listener registry.
-    (@events[type] ||= []).push listener if typeof type is 'string' and type and typeof listener is 'function'
+    (@events[type] ||= []).push listener if typeof type is 'string' and typeof listener is 'function'
     @
 
   # Removes a previously-attached event listener. If the `listener` function is omitted,
   # all listeners for the event `type` will be removed. If both the event and listener
   # are omitted, *all* event listeners will be removed.
   @::detach = Test::detach = (type, listener) ->
-    if typeof @events is 'object' and @events
-      # Remove all event listeners.
-      @events = {} unless type? and listener?
-      if typeof type is 'string' and type and (listeners = @events[type]) and (length = listeners.length)
-        # Remove the listener from the event listener registry.
-        listeners.splice(length, 1) while length-- when listeners[length] is listener
-        # Remove the listener registry if it is empty or the listener was omitted.
-        delete @events[type] unless listener? or listeners.length
+    @events ||= {}
+    # Remove all event listeners.
+    @events = {} unless type? and listener?
+    if typeof type is 'string' and (listeners = @events[type]) and (length = listeners.length)
+      # Remove the listener from the event listener registry.
+      listeners.splice(length, 1) while length-- when listeners[length] is listener
+      # Remove the listener registry if it is empty or the listener was omitted.
+      delete @events[type] if not listener? or not listeners.length
     @
 
   # Triggers an event, specified by either a string identifier or an event object with a
   # `type` property.
   @::trigger = Test::trigger = (event) ->
-    isEvent = typeof event is 'object'
-    if (isEvent or typeof event is 'string') and event and typeof @events is 'object' and @events
-      # Convert a string identifier into an event object.
-      event = {type: event} unless isEvent
-      type = event.type
+    @events ||= {}
+    # Convert a string identifier into an event object.
+    (event = type: event) if typeof event is 'string'
+    if typeof (type = event and event.type) is 'string'
       # Capture a reference to the current event target.
       event.target = @ unless 'target' of event
-      if (listeners = typeof type is 'string' and @events[type])
+      if (listeners = @events[type])
         # Clone the event listener registry.
         listeners = listeners.slice 0
         # Execute each listener.
