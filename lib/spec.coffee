@@ -133,16 +133,13 @@
         @done() unless ok
       @
 
-    # Tests whether `expression` is truthy. The optional `data` argument may specify either
-    # an assertion message or an object with three properties: `actual` contains the actual
-    # value passed to the assertion, `expected` contains the expected value, and `message`
-    # contains the assertion message. The message defaults to the name of the current
-    # assertion (e.g., `ok`). You can use this method to create custom assertions.
-    ok: (expression, data) ->
-      isData = typeof data is 'object' and data
-      # Convert a data object into an event object.
-      event = actual: (if isData and 'actual' of data then data.actual else expression), expected: (if isData and 'expected' of data then data.expected else true), message: (if isData then data.message else data)
-      event.message = 'ok' unless typeof event.message is 'string' and event.message
+    # Tests whether `expression` is truthy. The `message`, `actual`, and `expected`
+    # arguments are optional. `message` specifies the assertion message, and defaults to
+    # the name of the current assertion (e.g., `ok`). `actual` and `expected` contain the
+    # actual and expected values passed to the assertion, respectively, allowing you to
+    # create custom assertions.
+    ok: (expression, message, actual, expected) ->
+      event = actual: (if 2 of arguments then actual else expression), expected: (if 3 of arguments then expected else true), message: typeof message is 'string' and message or 'ok'
       # Note: To test strictly for the boolean value `true`, use `equal()` instead.
       if expression
         @assertions++
@@ -154,22 +151,22 @@
 
     # Tests whether `actual` is **identical** to `expected`, as determined by the `is`
     # operator.
-    equal: (actual, expected, message) -> @ok actual is expected, actual: actual, expected: expected, message: typeof message is 'string' and message or 'equal'
+    equal: (actual, expected, message) -> @ok actual is expected, typeof message is 'string' and message or 'equal', actual, expected
 
     # Tests for **strict** inequality (`actual isnt expected`).
-    notEqual: (actual, expected, message) -> @ok actual isnt expected, actual: actual, expected: expected, message: typeof message is 'string' and message or 'notEqual'
+    notEqual: (actual, expected, message) -> @ok actual isnt expected, typeof message is 'string' and message or 'notEqual', actual, expected
 
     # Tests for loose or **coercive** equality (`actual == expected`).
-    looseEqual: (actual, expected, message) -> @ok `actual == expected`, actual: actual, expected: expected, message: typeof message is 'string' and message or 'looseEqual'
+    looseEqual: (actual, expected, message) -> @ok `actual == expected`, typeof message is 'string' and message or 'looseEqual', actual, expected
 
     # Tests for **loose** inequality (`actual != expected`).
-    notLooseEqual: (actual, expected, message) -> @ok `actual != expected`, actual: actual, expected: expected, message: typeof message is 'string' and message or 'notLooseEqual'
+    notLooseEqual: (actual, expected, message) -> @ok `actual != expected`, typeof message is 'string' and message or 'notLooseEqual', actual, expected
 
     # Tests for deep equality and equivalence, as determined by the `eq()` function.
-    deepEqual: (actual, expected, message) -> @ok eq(actual, expected, []), actual: actual, expected: expected, message: typeof message is 'string' and message or 'deepEqual'
+    deepEqual: (actual, expected, message) -> @ok eq(actual, expected, []), typeof message is 'string' and message or 'deepEqual', actual, expected
 
     # Tests for deep inequality.
-    notDeepEqual: (actual, expected, message) -> @ok not eq(actual, expected, []), actual: actual, expected: expected, message: typeof message is 'string' and message or 'notDeepEqual'
+    notDeepEqual: (actual, expected, message) -> @ok not eq(actual, expected, []), typeof message is 'string' and message or 'notDeepEqual', actual, expected
 
     # Tests whether the function `block` throws an error. Both `expected` and `message`
     # are optional; if the `message` is omitted and `expected` is not a RegExp or
@@ -191,7 +188,7 @@
           else
             @errors++
             return @trigger type: 'error', error: error
-      @ok ok, actual: block, expected: expected, message: typeof message is 'string' and message or 'raises'
+      @ok ok, typeof message is 'string' and message or 'raises', block, expected
 
     # Completes a test with an optional expected number of `assertions`. This method
     # **must** be called at the end of each test.
