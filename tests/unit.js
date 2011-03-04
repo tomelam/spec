@@ -88,7 +88,10 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
   }).add('Test::notDeepEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::raises', function() {
+  }).add('Test::error', function() {
+    // ...
+    this.done(0);
+  }).add('Test::noError', function() {
     // ...
     this.done(0);
   }).add('Test::done', function() {
