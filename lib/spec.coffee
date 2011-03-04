@@ -13,7 +13,7 @@
 # create routines for setting up and tearing down tests, handling assertions, failures,
 # and errors, and logging test results.
 
-(exports ? this).Spec = class
+(@exports ? @).Spec = class
   # Creates a new spec. The `name` is optional.
   constructor: (name) -> @name = typeof name is 'string' and name or 'Anonymous Spec'
 
@@ -82,8 +82,6 @@
       when '[object RegExp]' then return left.source is right.source and left.global is right.global and left.multiline is right.multiline and left.ignoreCase is right.ignoreCase
       # Compare functions.
       when '[object Function]' then return left is right
-      # Compare array lengths to determine if a deep comparison is necessary.
-      when '[object Array]' then return false unless left.length is right.length
     # Recursively compare objects and arrays.
     if typeof left is 'object'
       # Assume equality for cyclic structures.
@@ -91,16 +89,20 @@
       # Add the object to the stack of traversed objects.
       stack.push left
       result = true; size = sizeRight = 0
-      for property, member of left
-        # Count the expected number of properties.
-        size++
-        # Deep compare each member.
-        break if not result = property of right and eq(member, right[property], stack)
-      # Ensure that both objects have the same number of properties.
-      if result
-        # Break as soon as the expected number of properties is greater.
-        break for property of right when ++sizeRight > size
-        result = size is sizeRight
+      if className is '[object Array]'
+        # Deep compare each element.
+        (break if not result = size of right and eq element, right[size], stack) for element, size in left when size of left if result = left.length is right.length
+      else
+        for property, member of left
+          # Count the expected number of properties.
+          size++
+          # Deep compare each member.
+          break if not result = property of right and eq member, right[property], stack
+        # Ensure that both objects have the same number of properties.
+        if result
+          # Break as soon as the expected number of properties is greater.
+          break for property of right when ++sizeRight > size
+          result = size is sizeRight
       # Remove the object from the stack once the comparison is complete.
       stack.pop()
       return result
@@ -169,27 +171,35 @@
     # Tests for deep inequality.
     notDeepEqual: (actual, expected, message) -> @ok not eq(actual, expected, []), typeof message is 'string' and message or 'notDeepEqual', actual, expected
 
-    # Tests whether the function `block` throws an error. Both `expected` and `message`
-    # are optional; if the `message` is omitted and `expected` is not a RegExp or
-    # validation function, the `expected` value is used as the message.
-    raises: (block, expected, message) ->
-      ok = false
+    # Ensures that the `block` throws an error. Both `expected` and `message` are optional;
+    # if the `message` is omitted and `expected` is not a RegExp or validation function,
+    # the `expected` value is used as the message.
+    error: (block, expected, message) ->
+      ok = typeof block is 'function'
       isRegExp = expected and getClass.call(expected) is '[object RegExp]'
       isFunction = not isRegExp and typeof expected is 'function'
       # The message was passed as the second argument.
       if not isFunction and not isRegExp and not message?
         message = expected
         expected = null
-      if typeof block is 'function'
+      if ok
+        try
+          block()
+          ok = false
+        catch error
+          actual = error
+          ok = not expected? or (isRegExp and expected.test(actual)) or (isFunction and expected.call(@, actual, @))
+      @ok ok, typeof message is 'string' and message or 'error'
+
+    # Ensures that the `block` does not throw any errors.
+    noError: (block, message) ->
+      if ok = typeof block is 'function'
         try
           block()
         catch error
-          if not expected? or (isRegExp and expected.test(error)) or (isFunction and expected.call(@, error, @))
-            ok = true
-          else
-            @errors++
-            return @trigger type: 'error', error: error
-      @ok ok, typeof message is 'string' and message or 'raises', block, expected
+          ok = false
+          actual = error
+      @ok ok, typeof message is 'string' and message or 'noError'
 
     # Completes a test with an optional expected number of `assertions`. This method
     # **must** be called at the end of each test.
