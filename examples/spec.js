@@ -117,42 +117,125 @@
     };
   }
 
-  // Attach the event listeners.
-  spec.on('start', function() {
-    // `start` is triggered before any tests are run.
-    console.log('Started spec `' + this.name + '`.');
+  // Internal event listener; expands and collapses test messages.
+  function onClick() {
+    // The event `target` is the list of messages.
+    var target = this.parentNode && this.parentNode.getElementsByTagName('ol')[0];
+    if (target) target.style.display = target.style.display == 'none' ? '' : 'none';
+  }
+
+  // Attach an event listener for logging test results.
+  spec.on('all', function(event) {
+    var type = event.type, target = event.target,
+    // Elements for logging the test results.
+    element, name, messages, message, data, actual, expected,
+    // Contains the aggregate spec results.
+    results = document.getElementById('results'),
+    // Contains the aggregate spec summary.
+    stats = document.getElementById('stats'),
+    // Displays the spec status.
+    status = document.getElementById('status');
+    if (!results || !status || !stats) return;
+    switch (type) {
+      // `start` is triggered before any tests are run.
+      case 'start':
+        // Clear the previous test results.
+        while (results.firstChild) results.removeChild(results.firstChild);
+        // Reset the spec status.
+        while (status.firstChild) status.removeChild(status.firstChild);
+        status.className = 'running';
+        // Clear the previous aggregate spec summary.
+        while (stats.firstChild) stats.removeChild(stats.firstChild);
+        stats.appendChild(document.createTextNode('Running...'));
+        break;
+      // `setup` is triggered at the start of each test.
+      case 'setup':
+        // Create a new element for the current test results.
+        element = document.createElement('li');
+        element.className = 'running';
+        name = document.createElement('strong');
+        // Show the name of the current test.
+        name.appendChild(document.createTextNode(target.name));
+        // Add an event listener for expanding and collapsing the test messages.
+        name.onclick = onClick;
+        element.appendChild(name);
+        results.appendChild(element);
+        break;
+      // `teardown` is triggered at the end of each test.
+      case 'teardown':
+        // The last element in the test results contains the results for the current test.
+        if (!(element = results.childNodes && results.childNodes[results.childNodes.length - 1])) return;
+        element.className = target.failures ? 'fail' : target.errors ? 'error' : 'pass';
+        break;
+      // `complete` is triggered once all tests have finished running.
+      case 'complete':
+        // Set the spec status.
+        status.className = target.failures ? 'fail' : target.errors ? 'error' : 'pass';
+        // Create the aggregate spec summary.
+        while (stats.firstChild) stats.removeChild(stats.firstChild);
+        stats.appendChild(document.createTextNode(target.assertions + ' assertions, ' + target.failures + ' failures, ' + target.errors + ' errors.'));
+        // Show the spec stats.
+        results.parentNode.insertBefore(stats, results.nextSibling);
+        break;
+      default:
+        if (!(element = results.childNodes && results.childNodes[results.childNodes.length - 1])) return;
+        // Create the list of messages.
+        if (!(messages = element.getElementsByTagName('ol')[0])) {
+          messages = document.createElement('ol');
+          // Hide the messages.
+          messages.style.display = 'none';
+          element.appendChild(messages);
+        }
+        // Create a new message.
+        message = document.createElement('li');
+        switch (type) {
+          // `assertion` is triggered when an assertion succeeds.
+          case 'assertion':
+            message.className = 'assertion';
+            // Add the message to the list of messages.
+            message.appendChild(document.createTextNode(event.message));
+            break;
+          // `failure` is triggered when an assertion fails.
+          case 'failure':
+            message.className = 'failure';
+            message.appendChild(document.createTextNode(event.message));
+            // Format and show the expected value.
+            expected = document.createElement('span');
+            expected.className = 'expected';
+            expected.appendChild(document.createTextNode('Expected: '));
+            data = document.createElement('code');
+            // Convert the expected value to JSON.
+            data.appendChild(document.createTextNode(stringify(event.expected)));
+            expected.appendChild(data);
+            message.appendChild(expected);
+            // Format and show the actual value.
+            actual = document.createElement('span');
+            actual.className = 'actual';
+            actual.appendChild(document.createTextNode('Actual: '));
+            data = document.createElement('code');
+            data.appendChild(document.createTextNode(stringify(event.actual)));
+            actual.appendChild(data);
+            message.appendChild(actual);
+            break;
+          // `error` is triggered when a test throws an error.
+          case 'error':
+            message.className = 'error';
+            // Format and show the error.
+            actual = document.createElement('span');
+            actual.className = 'actual';
+            actual.appendChild(document.createTextNode('Error: '));
+            data = document.createElement('code');
+            data.appendChild(document.createTextNode(stringify(event.error)));
+            actual.appendChild(data);
+            message.appendChild(actual);
+            break;
+        }
+        // Show the message.
+        messages.appendChild(message);
+    }
   });
 
-  spec.on('setup', function(event) {
-    // `setup` is triggered at the start of each test.
-    console.log('Started test `' + event.target.name + '`.');
-  });
-
-  spec.on('assertion', function(event) {
-    // `assertion` is triggered when an assertion succeeds.
-    console.log('Assertion: ' + event.message + '.');
-  });
-
-  spec.on('failure', function(event) {
-    // `failure` is triggered when an assertion fails.
-    console.log('Failure: ' + event.message + '. Expected: ' + stringify(event.expected) + '. Actual: ' + stringify(event.actual) + '.');
-  });
-
-  spec.on('error', function(event) {
-    // `error` is triggered when a test throws an error.
-    console.log('Error: ' + stringify(event.error));
-  });
-
-  spec.on('teardown', function(event) {
-    // `teardown` is triggered at the end of each test.
-    console.log('Finished test `' + event.target.name + '`. ' + event.target.assertions + ' assertions, ' + event.target.failures + ' failures, ' + event.target.errors + ' errors.');
-  });
-
-  spec.on('complete', function() {
-    // `complete` is triggered once all tests have finished running.
-    console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
-  });
-
+  // Add unit tests.
   spec.add('ajax', function(test) {
     Miniatures.ajax({
       'url': 'spec.html',
@@ -197,6 +280,9 @@
     this.done();
   });
 
-  spec.run();
+  // Run the spec.
+  this.onload = function() {
+    spec.run();
+  };
 
-}());
+}).call(this);
