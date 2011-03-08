@@ -15,7 +15,9 @@
 
 (@exports ? @).Spec = class
   # Creates a new spec. The `name` is optional.
-  constructor: (name) -> @name = typeof name is 'string' and name or 'Anonymous Spec'
+  constructor: (name) -> @name = name if typeof name is 'string' and name
+
+  name: 'Anonymous Spec'
 
   # The current version of Spec. Keep in sync with `package.json`.
   @version = '1.0.0rc2'
@@ -112,11 +114,12 @@
     # The `Spec.Test` class wraps a `test` function with several convenience methods
     # and assertions. The `name` is optional.
     constructor: (name, test) ->
-      if typeof name is 'function' and not test?
-        test = name
-        name = null
-      @name = typeof name is 'string' and name or 'Anonymous Test'
-      @test = if typeof test is 'function' then test else null
+      test = name if if typeof name is 'function' and not test?
+      @name = name if typeof name is 'string' and name
+      @test = test if typeof test is 'function'
+
+    name: 'Anonymous Test'
+    test: null
 
     # Runs the test.
     run: ->
