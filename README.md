@@ -46,12 +46,12 @@ Spec has been tested with the following web browsers, CommonJS environments, and
       <body>
         <script src="/path/to/spec.js"></script>
         <script>
-          var spec = Spec('Sample Spec');
+          var spec = new Spec('Sample Spec');
           spec.on('start', function() {
             // ...
           });
           // ...
-          spec.add('Sample Test', function() {
+          spec.addTest('Sample Test', function() {
             // ...
           });
           // ...
@@ -68,12 +68,12 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 
 #### Example
 
-    var Spec = require('spec').Spec, spec = Spec('Sample Spec');
+    var Spec = require('spec').Spec, spec = new Spec('Sample Spec');
     spec.on('start', function() {
       // ...
     });
     // ...
-    spec.add('Sample Test', function() {
+    spec.addTest('Sample Test', function() {
       // ...
     });
     // ...
@@ -89,12 +89,12 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 #### Example
 
     load('/path/to/spec.js');
-    var spec = Spec('Sample Spec');
+    var spec = new Spec('Sample Spec');
     spec.on('start', function() {
       // ...
     });
     // ...
-    spec.add('Sample Test', function() {
+    spec.addTest('Sample Test', function() {
       // ...
     });
     // ...

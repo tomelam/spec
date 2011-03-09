@@ -236,7 +236,7 @@
   });
 
   // Add unit tests.
-  spec.add('ajax', function(test) {
+  spec.addTest('ajax', function(test) {
     Miniatures.ajax({
       'url': 'spec.html',
       'complete': function(transport) {
@@ -246,7 +246,7 @@
     });
   });
 
-  spec.add('sortBy', function(test) {
+  spec.addTest('sortBy', function(test) {
     var data = [{
       'name': 'John-David Dalton',
       'nickname': 'jddalton'

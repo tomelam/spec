@@ -23,7 +23,7 @@
   @version = '1.0.0rc2'
 
   # Adds a new `test` function to the spec. The `name` is optional.
-  add: (name, test) ->
+  addTest: (name, test) ->
     @push new Test(name, test)
     @
 

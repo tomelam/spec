@@ -44,66 +44,66 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
     console.log('Finished spec `' + this.name + '`. ' + this.assertions + ' assertions, ' + this.failures + ' failures, ' + this.errors + ' errors.');
   });
 
-  Tests.add('Spec::on', function() {
+  Tests.addTest('Spec::on', function() {
     // ...
     this.done(0);
-  }).add('Spec::detach', function() {
+  }).addTest('Spec::detach', function() {
     // ...
     this.done(0);
-  }).add('Spec::trigger', function() {
+  }).addTest('Spec::trigger', function() {
     // ...
     this.done(0);
-  }).add('Spec::add', function() {
+  }).addTest('Spec::add', function() {
     // ...
     this.done(0);
-  }).add('Spec::run', function() {
+  }).addTest('Spec::run', function() {
     // ...
     this.done(0);
-  }).add('Spec::Array Methods', function() {
+  }).addTest('Spec::Array Methods', function() {
     // ...
     this.done(0);
   });
 
-  Tests.add('Test::run', function() {
+  Tests.addTest('Test::run', function() {
     // ...
     this.done(0);
-  }).add('Test::ok', function() {
+  }).addTest('Test::ok', function() {
     // ...
     this.done(0);
-  }).add('Test::equal', function() {
+  }).addTest('Test::equal', function() {
     // ...
     this.done(0);
-  }).add('Test::notEqual', function() {
+  }).addTest('Test::notEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::looseEqual', function() {
+  }).addTest('Test::looseEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::notLooseEqual', function() {
+  }).addTest('Test::notLooseEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::deepEqual', function() {
+  }).addTest('Test::deepEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::notDeepEqual', function() {
+  }).addTest('Test::notDeepEqual', function() {
     // ...
     this.done(0);
-  }).add('Test::error', function() {
+  }).addTest('Test::error', function() {
     // ...
     this.done(0);
-  }).add('Test::noError', function() {
+  }).addTest('Test::noError', function() {
     // ...
     this.done(0);
-  }).add('Test::done', function() {
+  }).addTest('Test::done', function() {
     // ...
     this.done(0);
-  }).add('Test::on', function() {
+  }).addTest('Test::on', function() {
     // ...
     this.done(0);
-  }).add('Test::detach', function() {
+  }).addTest('Test::detach', function() {
     // ...
     this.done(0);
-  }).add('Test::trigger', function() {
+  }).addTest('Test::trigger', function() {
     // ...
     this.done(0);
   });
