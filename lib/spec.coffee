@@ -31,18 +31,18 @@
   run: ->
     # Create the aggregate spec summary.
     @assertions = @failures = @errors = 0
-    # Internal event listener invoked every time a test triggers an event.
-    onTestEvent = (event) =>
+    # Internal callback invoked every time a test emits an event.
+    onEvent = (event) =>
       {target, type} = event
-      # Proxy the triggered event.
-      @trigger event
+      # Proxy the emitted event.
+      @emit event
       if type is 'teardown'
         # Update the spec summary.
         @assertions += target.assertions
         @failures += target.failures
         @errors += target.errors
-        # Remove the internal event listener.
-        @detach 'all', onTestEvent
+        # Remove the event callback.
+        @removeListener 'all', onEvent
         # Remove the completed test and run the next test.
         if (target = @shift())
           target.run()
@@ -50,10 +50,10 @@
           # Ensure that the spec is empty.
           delete @[0] unless @length
           # Finish running the spec.
-          @trigger 'complete'
-    # Attach the internal event listener and begin running the tests.
-    test.on('all', onTestEvent) for test in @
-    @trigger('start').shift().run()
+          @emit 'complete'
+    # Register the callback and begin running the tests.
+    test.on('all', onEvent) for test in @
+    @emit('start').shift().run()
     @
 
   # Array methods.
@@ -114,7 +114,7 @@
     # The `Spec.Test` class wraps a `test` function with several convenience methods
     # and assertions. The `name` is optional.
     constructor: (name, test) ->
-      test = name if if typeof name is 'function' and not test?
+      test = name if typeof name is 'function' and not test?
       @name = name if typeof name is 'string' and name
       @test = test if typeof test is 'function'
 
@@ -125,13 +125,13 @@
     run: ->
       ok = typeof @test is 'function'
       @assertions = @failures = @errors = 0
-      @trigger 'setup'
+      @emit 'setup'
       try
         # Pass the wrapper as the first argument to the test function.
         @test(@) if ok
       catch error
         @errors++
-        @trigger type: 'error', error: error
+        @emit type: 'error', error: error
         ok = false
       finally
         # Invalid test function or error; finish running the test.
@@ -153,7 +153,7 @@
       else
         @failures++
         event.type = 'failure'
-      @trigger event
+      @emit event
 
     # Tests whether `actual` is **identical** to `expected`, as determined by the `is`
     # operator.
@@ -209,66 +209,85 @@
     done: (assertions, message) ->
       # Verify that the expected number of assertions were executed.
       @ok(@assertions is assertions, typeof message is 'string' and message or 'done', @assertions, assertions) if typeof assertions is 'number'
-      @trigger 'teardown'
+      @emit 'teardown'
 
   # Custom Events
   # -------------
 
-  # Methods for adding, removing, and firing custom events. You can add and remove event
-  # listeners; triggering an event executes its listeners in succession.
+  # Methods for adding, removing, and firing custom events. You can add and remove
+  # callbacks for each event; emitting an event executes its callbacks in succession.
 
-  # Adds an event listener. The `listener` will be invoked each time the event `type`,
-  # specified by a string identifier, is fired. Listeners attached to the `all` event
-  # will be invoked when *any* event is triggered, while those attached to the `error`
-  # event will be invoked when a triggered listener throws an error.
-  @::on = Test::on = (type, listener) ->
+  # Registers a `callback` function for an `event`. The `callback` will be invoked
+  # whenever the `event`, specified by a string identifier, is emitted. If the `event`
+  # is `'all'`, the callback will be invoked for all emitted events; if the `event` is
+  # `'error'`, the callback will be invoked whenever an emitted event throws an error.
+  @::on = @::addListener = Test::on = Test::addListener = (event, callback) ->
     # Create the event registry if it doesn't exist.
     @events ||= {}
-    # Add the event listener to the listener registry.
-    (@events[type] ||= []).push listener if typeof type is 'string' and typeof listener is 'function'
+    # Add the callback to the callback registry.
+    (@events[event] ||= []).push callback if typeof event is 'string' and typeof callback is 'function'
     @
 
-  # Removes a previously-attached event listener. If the `listener` function is omitted,
-  # all listeners for the event `type` will be removed. If both the event and listener
-  # are omitted, *all* event listeners will be removed.
-  @::detach = Test::detach = (type, listener) ->
+  # Removes a previously-registered `callback` function for an `event`.
+  @::removeListener = Test::removeListener = (event, callback) ->
     @events ||= {}
-    # Remove all event listeners.
-    @events = {} unless type? and listener?
-    if typeof type is 'string' and (listeners = @events[type]) and (length = listeners.length)
-      # Remove the listener from the event listener registry.
-      listeners.splice(length, 1) while length-- when listeners[length] is listener
-      # Remove the listener registry if it is empty or the listener was omitted.
-      delete @events[type] if not listener? or not listeners.length
+    if typeof event is 'string' and typeof callback is 'function' and (callbacks = @events[event]) and (length = callbacks.length)
+      # Remove the callback from the callback registry.
+      callbacks.splice(length, 1) while length-- when callbacks[length] is callback
+      # Clean up empty callback registries.
+      delete @events[event] if not callbacks.length
     @
 
-  # Triggers an event, specified by either a string identifier or an event object with a
+  # Removes all registered callback functions for an `event`, or all callbacks for all
+  # events if the `event` is omitted.
+  @::removeAllListeners = Test::removeAllListeners = (event) ->
+    if not event?
+      # Clear the event registry.
+      @events = {}
+    else if typeof event is 'string' and @events
+      # Remove an event's callback registry.
+      delete @events[event]
+    @
+
+  # Registers a one-time `callback` for the specified `event`. The callback is invoked
+  # only the first time the `event` is emitted, after which it is removed.
+  @::once = Test::once = (event, callback) ->
+    if typeof event is 'string' and typeof callback is 'function'
+      onEvent = (event) =>
+        @removeListener event.type, onEvent
+        @callback.call @, event
+      @on event, onEvent
+    @
+
+  # Emits an `event`, specified by either a string identifier or an event object with a
   # `type` property.
-  @::trigger = Test::trigger = (event) ->
+  @::emit = Test::emit = (event) ->
     @events ||= {}
     # Convert a string identifier into an event object.
     (event = type: event) if typeof event is 'string'
     if typeof (type = event and event.type) is 'string'
       # Capture a reference to the current event target.
       event.target = @ unless 'target' of event
-      if (listeners = @events[type])
-        # Clone the event listener registry.
-        listeners = listeners.slice 0
-        # Execute each listener.
-        for listener in listeners when typeof listener is 'function'
+      if (callbacks = @events[type])
+        # Clone the event callback registry.
+        callbacks = callbacks.slice 0
+        # Execute each callback.
+        for callback in callbacks when typeof callback is 'function'
           # Wrap each invocation in a `try...catch` statement to ensure that all
-          # subsequent listeners are executed.
+          # subsequent callbacks are executed.
           try
-            break if listener.call(@, event) is false
+            # Prevent subsequent callbacks from executing if the callback explicitly
+            # returns `false`.
+            break if callback.call(@, event) is false
           catch error
-            # Trigger the `error` event if a listener throws an error.
-            return (@trigger type: 'error', error: error) if type isnt 'error' and @events.error and @events.error.length
-      # Trigger the special `all` event.
-      if type isnt 'all' and (listeners = @events.all)
-        listeners = listeners.slice 0
-        for listener in listeners when typeof listener is 'function'
+            # Emit the `error` event if a callback throws an error.
+            return (@emit type: 'error', error: error) if type isnt 'error'
+      # Emit the special `all` event.
+      if type isnt 'all' and (callbacks = @events.all)
+        callbacks = callbacks.slice 0
+        for callback in callbacks when typeof callback is 'function'
           try
-            break if listener.call(@, event) is false
+            break if callback.call(@, event) is false
           catch error
-            return (@trigger type: 'error', error: error) if type isnt 'error' and @events.error and @events.error.length
+            return (@emit type: 'error', error: error) if type isnt 'error'
     @
