@@ -47,13 +47,19 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
   Tests.addTest('Spec::on', function() {
     // ...
     this.done(0);
-  }).addTest('Spec::detach', function() {
+  }).addTest('Spec::removeListener', function() {
     // ...
     this.done(0);
-  }).addTest('Spec::trigger', function() {
+  }).addTest('Spec::removeAllListeners', function() {
     // ...
     this.done(0);
-  }).addTest('Spec::add', function() {
+  }).addTest('Spec::once', function() {
+    // ...
+    this.done(0);
+  }).addTest('Spec::emit', function() {
+    // ...
+    this.done(0);
+  }).addTest('Spec::addTest', function() {
     // ...
     this.done(0);
   }).addTest('Spec::run', function() {
@@ -100,10 +106,16 @@ if (typeof Spec != 'function') throw new Error('Spec is required to run the unit
   }).addTest('Test::on', function() {
     // ...
     this.done(0);
-  }).addTest('Test::detach', function() {
+  }).addTest('Test::removeListener', function() {
     // ...
     this.done(0);
-  }).addTest('Test::trigger', function() {
+  }).addTest('Test::removeAllListeners', function() {
+    // ...
+    this.done(0);
+  }).addTest('Test::once', function() {
+    // ...
+    this.done(0);
+  }).addTest('Test::emit', function() {
     // ...
     this.done(0);
   });
