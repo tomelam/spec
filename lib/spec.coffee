@@ -20,7 +20,7 @@
   name: 'Anonymous Spec'
 
   # The current version of Spec. Keep in sync with `package.json`.
-  @version = '1.0.0rc2'
+  @version = '1.0.0rc3'
 
   # Adds a new `test` function to the spec. The `name` is optional.
   addTest: (name, test) ->
