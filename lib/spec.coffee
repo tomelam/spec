@@ -30,30 +30,33 @@
   # Successively runs each test in the spec.
   run: ->
     # Create the aggregate spec summary.
-    @assertions = @failures = @errors = 0
+    index = @assertions = @failures = @errors = 0
     # Internal callback invoked every time a test emits an event.
     onEvent = (event) =>
       {target, type} = event
       # Proxy the emitted event.
       @emit event
-      if type is 'teardown'
+      switch type
         # Update the spec summary.
-        @assertions += target.assertions
-        @failures += target.failures
-        @errors += target.errors
-        # Remove the event callback.
-        @removeListener 'all', onEvent
-        # Remove the completed test and run the next test.
-        if (target = @shift())
-          target.run()
-        else
-          # Ensure that the spec is empty.
-          delete @[0] unless @length
-          # Finish running the spec.
-          @emit 'complete'
-    # Register the callback and begin running the tests.
-    test.on('all', onEvent) for test in @
-    @emit('start').shift().run()
+        when 'assertion' then @assertions++
+        when 'failure' then @failures++
+        when 'error' then @errors++
+        when 'teardown'
+          # Remove the event callback.
+          @removeListener 'all', onEvent
+          # Run the next test.
+          if (target = @[++index]) instanceof Test
+            target.on('all', onEvent).run()
+          else
+            # Finish running the spec.
+            @emit 'complete'
+      true
+    @emit 'start'
+    if @length and (test = @[index]) instanceof Test
+      # Begin running the tests.
+      test.on('all', onEvent).run()
+    else
+      @emit 'complete'
     @
 
   # Array methods.
