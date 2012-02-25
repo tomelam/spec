@@ -7,21 +7,17 @@ Spec is environment and framework-agnostic: it has no external dependencies, and
 
 ## Downloads
 
-- [JavaScript Version](http://kitcambridge.github.com/spec/lib/spec.js)
+**Current Version**: [1.0.0rc3](http://kitcambridge.github.com/spec/lib/spec.js)
 
-You can also install the latest version of Spec using [npm](http://npmjs.org), the Node Package Manager:
+If you're a [Node](http://nodejs.org/) user, Spec is available on [npm](http://npmjs.org/):
 
     $ npm install spec
 
-### Annotated Source Code
-
-- [JavaScript Version](http://kitcambridge.github.com/spec/docs/spec.js.html)
-
-An [example spec](http://kitcambridge.github.com/spec/examples/spec.html) is also included for your perusal.
+The [annotated source code](http://kitcambridge.github.com/spec/docs/spec.js.html) is available for your perusal.
 
 ## Compatibility
 
-Spec has been tested with the following web browsers, CommonJS environments, and JavaScript engines.
+Spec has been **tested** with the following web browsers, CommonJS environments, and JavaScript engines.
 
 ### Web Browsers
 
@@ -60,7 +56,7 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 
 ### CommonJS Environments
 
-- [Node](http://nodejs.org/) 0.2.6 and higher
+- Node 0.2.6 and higher
 - [Narwhal](http://narwhaljs.org/) 0.3.2 and higher
 - [RingoJS](http://ringojs.org/) 0.4 and higher
 
@@ -104,7 +100,7 @@ Check out a working copy of the Spec source code with [Git](http://git-scm.com/)
 
     $ git clone git://github.com/kitcambridge/spec.git
 
-If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario.
+If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario. Please make sure to update the unit tests in the `tests` directory as well.
 
 Alternatively, you may use the [GitHub issue tracker](http://github.com/kitcambridge/spec/issues) to submit bug reports and feature requests. For the former, please make sure that you detail how to reproduce the bug, *including the environments that exhibit it*.
 
@@ -115,8 +111,7 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 - **Spacing**: Use two spaces for indentation. No tabs.
 - **Naming**: Keep variable and method names concise but descriptive. `index` and `callback` are preferable to `i` and `fn`.
 - **Comments**: Significant changes and new methods should be annotated with comments.
-- **Performance**: Don't overuse abstractions or slow down critical code to add a feature of marginal utility.
-- **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). To check the source code for problems, you can run `jsl -conf jsl.conf` from the command line.
+- **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). A configuration file is included in the repository; to check the source code for problems, run `jsl -conf jsl.conf`.
 
 ### Contributors
 
