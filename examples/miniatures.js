@@ -1,7 +1,7 @@
 /* Miniatures JavaScript library
  *
- * Created by Kit Goncharov.
- * http://kitgoncharov.github.com
+ * Created by Kit Cambridge.
+ * http://kitcambridge.github.com
 */
 
 (function() {

@@ -254,8 +254,8 @@
       'name': 'Aaron Beal',
       'nickname': 'adbeal'
     }, {
-      'name': 'Kit Goncharov',
-      'nickname': 'ksgoncharov'
+      'name': 'Kit Cambridge',
+      'nickname': 'kscambridge'
     }, {
       'name': 'Maddy Jalbert',
       'nickname': 'mcjalbert'
@@ -273,8 +273,8 @@
       'name': 'Maddy Jalbert',
       'nickname': 'mcjalbert'
     }, {
-      'name': 'Kit Goncharov',
-      'nickname': 'ksgoncharov'
+      'name': 'Kit Cambridge',
+      'nickname': 'kscambridge'
     }]);
 
     this.done();

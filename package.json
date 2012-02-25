@@ -2,30 +2,30 @@
   "name": "spec",
   "version": "1.0.0rc3",
   "description": "An event-driven unit testing library for JavaScript and CoffeeScript.",
-  "homepage": "http://github.com/kitgoncharov/Spec",
+  "homepage": "http://github.com/kitcambridge/Spec",
   "main": "./lib/spec",
   "keywords": ["unit", "test", "testing", "event", "spec", "suite", "assert"],
   "licenses": [{
     "type": "MIT",
-    "url": "http://kitgoncharov.github.com/Spec/LICENSE"
+    "url": "http://kitcambridge.github.com/Spec/LICENSE"
   }],
   "author": {
-    "name": "Kit Goncharov",
-    "web": "http://kitgoncharov.github.com"
+    "name": "Kit Cambridge",
+    "web": "http://kitcambridge.github.com"
   },
   "maintainers": [{
-    "name": "Kit Goncharov",
-    "web": "http://kitgoncharov.github.com"
+    "name": "Kit Cambridge",
+    "web": "http://kitcambridge.github.com"
   }, {
     "name": "John-David Dalton",
     "email": "john@fusejs.com",
     "web": "http://allyoucanleet.com"
   }],
   "bugs": {
-    "url": "http://github.com/kitgoncharov/Spec/issues"
+    "url": "http://github.com/kitcambridge/Spec/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kitgoncharov/Spec.git"
+    "url": "git://github.com/kitcambridge/Spec.git"
   }
 }

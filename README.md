@@ -7,8 +7,8 @@ Spec is environment and framework-agnostic: it has no external dependencies, and
 
 ## Downloads
 
-- [JavaScript Version](http://kitgoncharov.github.com/Spec/lib/spec.js)
-- [CoffeeScript Version](http://kitgoncharov.github.com/Spec/lib/spec.coffee)
+- [JavaScript Version](http://kitcambridge.github.com/Spec/lib/spec.js)
+- [CoffeeScript Version](http://kitcambridge.github.com/Spec/lib/spec.coffee)
 
 You can also install the latest version of Spec using [npm](http://npmjs.org), the Node Package Manager:
 
@@ -16,10 +16,10 @@ You can also install the latest version of Spec using [npm](http://npmjs.org), t
 
 ### Annotated Source Code
 
-- [JavaScript Version](http://kitgoncharov.github.com/Spec/docs/spec.js.html)
-- [CoffeeScript Version](http://kitgoncharov.github.com/Spec/docs/spec.coffee.html)
+- [JavaScript Version](http://kitcambridge.github.com/Spec/docs/spec.js.html)
+- [CoffeeScript Version](http://kitcambridge.github.com/Spec/docs/spec.coffee.html)
 
-An [example spec](http://kitgoncharov.github.com/Spec/examples/spec.html) is also included for your perusal.
+An [example spec](http://kitcambridge.github.com/Spec/examples/spec.html) is also included for your perusal.
 
 ## Compatibility
 
@@ -104,11 +104,11 @@ Spec has been tested with the following web browsers, CommonJS environments, and
 
 Check out a working copy of the Spec source code with [Git](http://git-scm.com/):
 
-    $ git clone git://github.com/kitgoncharov/Spec.git
+    $ git clone git://github.com/kitcambridge/Spec.git
 
 If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario.
 
-Alternatively, you may use the [GitHub issue tracker](http://github.com/kitgoncharov/Spec/issues) to submit bug reports and feature requests. For the former, please make sure that you detail how to reproduce the bug, *including the environments that exhibit it*.
+Alternatively, you may use the [GitHub issue tracker](http://github.com/kitcambridge/Spec/issues) to submit bug reports and feature requests. For the former, please make sure that you detail how to reproduce the bug, *including the environments that exhibit it*.
 
 ### Coding Guidelines
 
@@ -127,7 +127,7 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 
 ## MIT License
 
-Copyright &copy; 2011 [Kit Goncharov](http://kitgoncharov.github.com).
+Copyright &copy; 2011-2012 [Kit Cambridge](http://kitcambridge.github.com).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
