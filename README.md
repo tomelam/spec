@@ -7,13 +7,13 @@ Spec is environment and framework-agnostic: it has no external dependencies, and
 
 ## Downloads
 
-**Current Version**: [1.0.0rc3](http://kitcambridge.github.com/spec/lib/spec.js)
+**Current Version**: [1.0.0rc4](http://kitcambridge.github.com/spec/lib/spec.js)
 
 If you're a [Node](http://nodejs.org/) user, Spec is available on [npm](http://npmjs.org/):
 
     $ npm install spec
 
-The [annotated source code](http://kitcambridge.github.com/spec/docs/spec.js.html) is available for your perusal.
+The [annotated source code](http://kitcambridge.github.com/spec/docs/spec.html) is available for your perusal.
 
 ## Compatibility
 

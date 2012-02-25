@@ -1,13 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang=en>
   <head>
-    <meta charset="utf-8">
+    <meta charset=utf-8>
     <title>Spec Unit Tests</title>
+    <link rel=stylesheet href=unit.css media=screen>
   </head>
   <body>
-    <h1>Spec Unit Tests</h1>
-    <p>Unit tests results will be logged to the console.</p>
-    <script src="../lib/spec.js"></script>
-    <script src="unit.js"></script>
+    <h1 id=header>Spec Unit Tests</h1>
+    <div id=status></div>
+    <ol id=results></ol>
+    <p id=stats></p>
+    <script>var Lynt = {}, curl = { "apiName": "require" };</script>
+    <script src=vendor/maddy.js></script>
+    <script src=../lib/spec.js></script>
+    <script src=vendor/require.js></script>
+    <script>
+    if (/[?&]async=false(?:&|$)/.test(this.location.search)) {
+      this.require = this.define = null;
+      document.write("<script src=\"unit.js\"><\/script>");
+    } else {
+      this.require({
+        // RequireJS accepts relative paths in the module name; `curl.js` does not. Both accept a
+        // `paths` map of module paths to relative paths.
+        "paths": {
+          "lib": "../lib"
+        },
+        // Thwart aggressive resource caching. RequireJS only.
+        "urlArgs": "async=" + (+new Date)
+      }, ["lib/spec", "unit"], function (Spec, tests) {
+        Lynt = Spec;
+        tests.run();
+      });
+    }
+    </script>
   </body>
 </html>
