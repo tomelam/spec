@@ -110,6 +110,7 @@ In addition to the following [Prototype-inspired](http://prototypejs.org/contrib
 
 - **Spacing**: Use two spaces for indentation. No tabs.
 - **Naming**: Keep variable and method names concise but descriptive. `index` and `callback` are preferable to `i` and `fn`.
+- **Functions**: Use [named function expressions](http://kangax.github.com/nfe/) to aid in debugging. Avoid anonymous functions.
 - **Comments**: Significant changes and new methods should be annotated with comments.
 - **Lint**: Make sure that your changes pass [JavaScript Lint](http://javascriptlint.com/). A configuration file is included in the repository; to check the source code for problems, run `jsl -conf jsl.conf`.
 
