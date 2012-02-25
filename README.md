@@ -99,7 +99,7 @@ Check out a working copy of the Spec source code with [Git](http://git-scm.com/)
 
     $ git clone git://github.com/kitcambridge/spec.git
 
-If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario. Please make sure to update the unit tests in the `tests` directory as well.
+If you'd like to contribute a feature or bug fix, you can [fork](http://help.github.com/forking/) Spec, commit your changes, and [send a pull request](http://help.github.com/pull-requests/). Please avoid submitting patches that are application- or environment-specific; Spec doesn't try to cover every possible testing scenario. Please make sure to update the unit tests in the `test` directory as well.
 
 Alternatively, you may use the [GitHub issue tracker](http://github.com/kitcambridge/spec/issues) to submit bug reports and feature requests. For the former, please make sure that you detail how to reproduce the bug, *including the environments that exhibit it*.
 

@@ -7,7 +7,7 @@
   "keywords": ["unit", "test", "testing", "event", "spec", "suite", "assert"],
   "licenses": [{
     "type": "MIT",
-    "url": "http://kitcambridge.github.com/spec/LICENSE"
+    "url": "http://kit.mit-license.org/"
   }],
   "author": {
     "name": "Kit Cambridge",
@@ -16,13 +16,12 @@
   "maintainers": [{
     "name": "Kit Cambridge",
     "web": "http://kitcambridge.github.com"
-  }, {
-    "name": "John-David Dalton",
-    "email": "john@fusejs.com",
-    "web": "http://allyoucanleet.com"
   }],
   "bugs": {
     "url": "http://github.com/kitcambridge/spec/issues"
+  },
+  "scripts": {
+    "test": "node test/unit.js"
   },
   "repository": {
     "type": "git",
