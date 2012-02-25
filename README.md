@@ -21,13 +21,12 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 
 ### Web Browsers
 
-- Microsoft [Internet Explorer](http://www.microsoft.com/windows/internet-explorer) for Windows, version 5.5 and higher
+- Windows [Internet Explorer](http://www.microsoft.com/windows/internet-explorer), version 6.0 and higher
 - Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.5 and higher
 - Apple [Safari](http://www.apple.com/safari), version 2.0 and higher
 - Google [Chrome](http://www.google.com/chrome), version 1.0 and higher
 - [Opera](http://www.opera.com) 7.54 and higher
 - [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
-- [Konqueror](http://www.konqueror.org) 3.4.3 and higher
 
 #### Example
 
@@ -40,12 +39,12 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
       <body>
         <script src="/path/to/spec.js"></script>
         <script>
-          var spec = new Spec('Sample Spec');
-          spec.on('start', function() {
+          var spec = new Spec.Suite("Sample Spec");
+          spec.on("start", function () {
             // ...
           });
           // ...
-          spec.addTest('Sample Test', function() {
+          spec.addTest("Sample Test", function () {
             // ...
           });
           // ...
@@ -62,12 +61,12 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 
 #### Example
 
-    var Spec = require('spec').Spec, spec = new Spec('Sample Spec');
-    spec.on('start', function() {
+    var Spec = require("spec").Spec, spec = new Spec.Suite("Sample Spec");
+    spec.on("start", function () {
       // ...
     });
     // ...
-    spec.addTest('Sample Test', function() {
+    spec.addTest("Sample Test", function () {
       // ...
     });
     // ...
@@ -82,13 +81,13 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 
 #### Example
 
-    load('/path/to/spec.js');
-    var spec = new Spec('Sample Spec');
-    spec.on('start', function() {
+    load("/path/to/spec.js");
+    var spec = new Spec.Suite("Sample Spec");
+    spec.on("start", function () {
       // ...
     });
     // ...
-    spec.addTest('Sample Test', function() {
+    spec.addTest("Sample Test", function () {
       // ...
     });
     // ...
