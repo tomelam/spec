@@ -1,13 +1,13 @@
 {
   "name": "spec",
   "version": "1.0.0rc3",
-  "description": "An event-driven unit testing library for JavaScript and CoffeeScript.",
-  "homepage": "http://github.com/kitcambridge/Spec",
+  "description": "An event-driven JavaScript unit testing library.",
+  "homepage": "http://github.com/kitcambridge/spec",
   "main": "./lib/spec",
   "keywords": ["unit", "test", "testing", "event", "spec", "suite", "assert"],
   "licenses": [{
     "type": "MIT",
-    "url": "http://kitcambridge.github.com/Spec/LICENSE"
+    "url": "http://kitcambridge.github.com/spec/LICENSE"
   }],
   "author": {
     "name": "Kit Cambridge",
@@ -22,10 +22,10 @@
     "web": "http://allyoucanleet.com"
   }],
   "bugs": {
-    "url": "http://github.com/kitcambridge/Spec/issues"
+    "url": "http://github.com/kitcambridge/spec/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kitcambridge/Spec.git"
+    "url": "git://github.com/kitcambridge/spec.git"
   }
 }
