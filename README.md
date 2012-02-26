@@ -13,7 +13,7 @@ If you're a [Node](http://nodejs.org/) user, Spec is available on [npm](http://n
 
     $ npm install spec
 
-The [annotated source code](http://kitcambridge.github.com/spec/docs/spec.html) is available for your perusal.
+The [annotated source code](http://kitcambridge.github.com/spec/docs/index.html) is available for your perusal.
 
 ## Compatibility
 
@@ -28,49 +28,11 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 - [Opera](http://www.opera.com) 7.54 and higher
 - [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
 
-#### Example
-
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <title>Sample Spec</title>
-      </head>
-      <body>
-        <script src="/path/to/spec.js"></script>
-        <script>
-          var spec = new Spec.Suite("Sample Spec");
-          spec.on("start", function () {
-            // ...
-          });
-          // ...
-          spec.addTest("Sample Test", function () {
-            // ...
-          });
-          // ...
-          spec.run();
-        </script>
-      </body>
-    </html>
-
 ### CommonJS Environments
 
 - Node 0.2.6 and higher
 - [Narwhal](http://narwhaljs.org/) 0.3.2 and higher
 - [RingoJS](http://ringojs.org/) 0.4 and higher
-
-#### Example
-
-    var Spec = require("spec").Spec, spec = new Spec.Suite("Sample Spec");
-    spec.on("start", function () {
-      // ...
-    });
-    // ...
-    spec.addTest("Sample Test", function () {
-      // ...
-    });
-    // ...
-    spec.run();
 
 ### JavaScript Engines
 
@@ -78,20 +40,6 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 - Mozilla [Rhino](http://www.mozilla.org/rhino) 1.7R1 and higher
 - WebKit [JSC](https://trac.webkit.org/wiki/JSC)
 - Google [V8](http://code.google.com/p/v8)
-
-#### Example
-
-    load("/path/to/spec.js");
-    var spec = new Spec.Suite("Sample Spec");
-    spec.on("start", function () {
-      // ...
-    });
-    // ...
-    spec.addTest("Sample Test", function () {
-      // ...
-    });
-    // ...
-    spec.run();
 
 ## Contributing to Spec
 
