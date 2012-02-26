@@ -703,7 +703,7 @@
     test.equal(events.size, 3, "The `size` property should be incremented each time an event is fired");
 
     events.size = 0;
-    events.removeListener("all").on("all", function () {
+    events.removeAllListeners("all").on("all", function () {
       events.size += 1;
     }).emit("all");
     test.equal(events.size, 1, "The `all` event should not be fired twice if it is explicitly fired");
@@ -711,12 +711,12 @@
     test.done(5);
   });
 
-  testSuite.addTest("Events#removeListener", function () {
+  testSuite.addTest("Events#removeAllListeners", function () {
     var events = new Spec.Events();
     events.size = 0;
     events.on("test", function () {
       events.size += 1;
-    }).emit("test").removeListener("test").emit("test");
+    }).emit("test").removeAllListeners("test").emit("test");
     this.equal(events.size, 1, "The `size` property should have only been incremented once, after which the event handler is removed");
     this.ok(Maddy.isEmpty(events.events), "The event registry should be empty");
     this.done(2);
@@ -804,7 +804,7 @@
       events.on("test all", callback);
     }).emit("test");
     this.notOk(size, "`on` invocations should not affect the behavior of `emit`");
-    events.removeListener().on("test", function () {
+    events.removeAllListeners().on("test", function () {
       events.removeListener("test all", callback);
     }).on("test all", callback).emit("test");
     this.equal(size, 2, "`removeListener` invocations should not affect the behavior of `emit`");
