@@ -34,7 +34,84 @@
   // Convenience aliases. `undefined`, `NaN`, and `Infinity` are defined
   // locally in case the global versions are overwritten.
   // -------------------------------------------------------------------
-  toString = {}.toString, undefined, NaN = 0 / 0, Infinity = 1 / 0,
+  getClass = {}.toString, undefined, NaN = 0 / 0, Infinity = 1 / 0,
+
+  // **clearElement** removes all child nodes from the given `element`.
+  clearElement = Spec.clearElement = function clearElement(element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+    return element;
+  },
+
+  // **buildNode** creates and returns a new element with the given `tagName`,
+  // DOM `properties`, and `children`.
+  buildNode = Spec.buildNode = (function () {
+    // Internal: Tests whether `document.createElement` supports the MSHTML
+    // extended syntax. This syntax is necessary for setting the `name` and
+    // `type` properties of elements, which are read-only in IE 7 and earlier.
+    var supportsExtendedElementSyntax = (function () {
+      try {
+        var element = document.createElement("<input name=a type=b>");
+        return element.name == "a" && element.type == "b";
+      } catch (exception) {
+        return false;
+      }
+    })();
+
+    // Internal: Returns an attribute string comprising the given attribute
+    // `name` and `value`.
+    function writeAttribute(name, value) {
+      return " " + name + "=\"" + value.replace(/"/g, "&quot;") + "\"";
+    }
+
+    // Expose the `buildNode` function.
+    function buildNode(tagName, properties, children) {
+      var hasProperties, element, property, length, value;
+      if (properties && getClass.call(properties) == "[object Array]") {
+        children = properties;
+        properties = null;
+      } else {
+        hasProperties = Object(properties) === properties;
+      }
+      // Set the read-only `name` and `type` properties in IE.
+      if (hasProperties && supportsExtendedElementSyntax) {
+        tagName = "<" + tagName;
+        if (Spec.hasKey(properties, "name")) {
+          tagName += writeAttribute("name", properties.name);
+          delete properties.name;
+        }
+        if (Spec.hasKey(properties, "type")) {
+          tagName += writeAttribute("type", properties.type);
+          delete properties.type;
+        }
+        tagName += ">";
+      }
+      element = document.createElement(tagName);
+      // Set the corresponding element and style properties.
+      if (hasProperties) {
+        if (Spec.hasKey(properties, "style")) {
+          Spec.forOwn(properties.style, function (property, value) {
+            element.style[property] = value;
+            return true;
+          });
+          delete properties.style;
+        }
+        Spec.forOwn(properties, function (property, value) {
+          element[property] = value;
+          return true;
+        });
+      }
+      // Append any child elements.
+      if (Object(children) === children) {
+        Spec.forEach(children, function (value) {
+          element.appendChild(value);
+        });
+      }
+      return element;
+    }
+    return buildNode;
+  })(),
 
   // Create the unit test suite.
   // ---------------------------
@@ -44,16 +121,9 @@
   // individual test results.
   onClick = function onClick() {
     // The event target is the list of messages.
-    var target = this.parentNode && this.parentNode.getElementsByTagName("ol")[0];
+    var target = this.parentNode && this.parentNode.childNodes[1];
     if (target) {
       target.style.display = target.style.display == "none" ? "" : "none";
-    }
-  },
-
-  // Internal method for clearing a DOM element.
-  clearElement = function clearElement(element) {
-    while (element.firstChild) {
-      element.removeChild(element.firstChild);
     }
   },
 
@@ -111,120 +181,96 @@
   // **createReport** creates a new QUnit-style web logger, returning an event
   // handler that can be attached to a suite.
   // -------------------------------------------------------------------------
-  createReport = Spec.createReport = function createReport(options) {
-    var document = isBrowser && global.document;
-    if (!document) {
-      throw TypeError("The current environment does not support DOM-based logging.");
-    }
-    options = Object(options);
-    // Return the logger event.
-    // ------------------------
-    return function (event) {
-      var type = event.type, target = event.target,
-      // Elements for logging the test results.
-      element, name, messages, message, data, actual, expected, results, stats, status;
-      if (!(results = document.getElementById(options.results))) {
-        throw TypeError("Missing the aggregate suite results element.");
+  createReport = Spec.createReport = function createReport(element) {
+    function onEvent(event) {
+      var type = event.type, target = event.target, messages, message;
+      if (getClass.call(element) == "[object String]") {
+        element = document.getElementById(element);
       }
-      if (!(stats = document.getElementById(options.summary))) {
-        throw TypeError("Missing the aggregate suite summary element.");
-      }
-      if (!(status = document.getElementById(options.status))) {
-        throw TypeError("Missing the suite status element.");
+      if (!element) {
+        throw TypeError(substitute("Invalid logger element: `%o`.", element));
       }
       switch (type) {
-        // `start` is fired before any tests are run.
+        // Clear the previous test results and initialize the logger elements.
         case "start":
           // Clear the previous test results.
-          clearElement(results);
-          // Reset the spec status.
-          clearElement(status);
-          status.className = "running";
-          // Clear the previous aggregate spec summary.
-          clearElement(stats);
-          stats.appendChild(document.createTextNode("Running..."));
+          clearElement(element);
+          // Re-initialize the logger elements.
+          Spec.forOwn((this.elements = {
+            "header": buildNode("h1", { "id": "header" }, [document.createTextNode(this.name)]),
+            // Representing the status of the suite (e.g., running, passed, failed).
+            "status": buildNode("div", { "id": "status", "className": "running" }),
+            // Contains the aggregate suite results.
+            "results": buildNode("ol", { "id": "results" }),
+            // Contains the aggregate suite summary. (`summary`)
+            "stats": buildNode("p", { "id": "stats" }, [document.createTextNode("Running...")])
+          }), function (name, component) {
+            // Append each element to the top-level container.
+            element.appendChild(component);
+          });
           break;
-        // `setup` is fired at the start of each test.
+        // Create a new element to display the results of the current test.
         case "setup":
-          // Create a new element for the current test results.
-          element = document.createElement("li");
-          element.className = "running";
-          name = document.createElement("strong");
-          // Show the name of the current test.
-          name.appendChild(document.createTextNode(target.name));
-          // Add an event listener for expanding and collapsing the test messages.
-          name.onclick = onClick;
-          element.appendChild(name);
-          results.appendChild(element);
+          // Attach the internal event handler to the element.
+          this.elements.results.appendChild(buildNode("li", { "className": "running" }, [
+            buildNode("strong", { "onclick": onClick }, [document.createTextNode(target.name)])
+          ]));
           break;
-        // `teardown` is fired at the end of each test.
+        // Update the status of the current test.
         case "teardown":
-          // The last element in the test results contains the results for the current test.
-          if (!(element = results.lastChild)) {
-            return;
-          }
-          element.className = target.failures ? "fail" : "pass";
+          this.elements.results.childNodes[this.position].className = target.failures ? "fail" : "pass";
           break;
-        // `complete` is fired once all tests have finished running.
+        // Update the suite status and cumulative summary.
         case "complete":
           // Set the spec status.
-          status.className = target.failures ? "fail" : "pass";
+          this.elements.status.className = target.failures ? "fail" : "pass";
           // Create the aggregate spec summary.
-          clearElement(stats);
-          stats.appendChild(document.createTextNode(substitute("%d assertions, %d failures.", target.assertions, target.failures)));
-          // Show the spec stats.
-          results.parentNode.insertBefore(stats, results.nextSibling);
+          clearElement(this.elements.stats).appendChild(document.createTextNode(substitute("%d assertions, %d failures.", target.assertions, target.failures)));
+          // Clean up.
+          delete this.elements;
           break;
-        default:
-          if (!(element = results.lastChild)) {
-            return;
-          }
-          // Create the list of messages.
-          if (!(messages = element.getElementsByTagName("ol")[0])) {
-            messages = document.createElement("ol");
-            // Hide the messages.
-            messages.style.display = "none";
-            element.appendChild(messages);
+        case "assertion":
+        case "failure":
+          // Create the message list if it doesn't already exist.
+          if (!(messages = this.elements.results.childNodes[this.position].childNodes[1])) {
+            // Hide the messages by default.
+            messages = buildNode("ol", { "style": { "display": "none" } });
+            this.elements.results.childNodes[this.position].appendChild(messages);
           }
           // Create a new message.
-          message = document.createElement("li");
-          if (type == "assertion") {
+          message = type == "assertion" ?
             // `assertion` is fired when an assertion succeeds.
-            message.className = "assertion";
-            // Add the message to the list of messages.
-            message.appendChild(document.createTextNode(event.message));
-          } else if (type == "failure") {
+            buildNode("li", { "className": "assertion" }, [
+              document.createTextNode(event.message)
+            ]) :
             // `failure` is fired when an assertion fails.
-            message.className = "failure";
-            message.appendChild(document.createTextNode(event.message));
-            // Format and show the expected value.
-            expected = document.createElement("span");
-            expected.className = "expected";
-            expected.appendChild(document.createTextNode("Expected: "));
-            data = document.createElement("code");
-            // Convert the expected value to JSON.
-            data.appendChild(document.createTextNode(Maddy.stringify(event.expected)));
-            expected.appendChild(data);
-            message.appendChild(expected);
-            // Format and show the actual value.
-            actual = document.createElement("span");
-            actual.className = "actual";
-            actual.appendChild(document.createTextNode("Actual: "));
-            data = document.createElement("code");
-            data.appendChild(document.createTextNode(Maddy.stringify(event.actual)));
-            actual.appendChild(data);
-            message.appendChild(actual);
-          }
+            buildNode("li", { "className": "failure" }, [
+              // Add the message to the list of messages.
+              document.createTextNode(event.message),
+              // Format and show the expected value.
+              buildNode("span", { "className": "expected" },
+                // Convert the expected value to JSON.
+                [document.createTextNode("Expected: "), buildNode("code", [
+                  document.createTextNode(Maddy.stringify(event.expected))
+                ])]),
+              // Format and show the actual value.
+              buildNode("span", { "className": "actual" },
+                // Convert the actual value to JSON.
+                [document.createTextNode("Actual: "), buildNode("code", [
+                  document.createTextNode(Maddy.stringify(event.actual))
+                ])])
+            ]);
           // Show the message.
           messages.appendChild(message);
       }
-    };
+    }
+    return onEvent;
   },
 
   // **createConsole** creates a new console-based logger.
   // -----------------------------------------------------
   createConsole = Spec.createConsole = function createConsole(print) {
-    return function (event) {
+    function onEvent(event) {
       switch (event.type) {
         case "start":
           print(substitute("Started spec `%s`.", this.name));
@@ -244,19 +290,13 @@
         case "complete":
           print(substitute("Finished spec `%s`. %d assertions, %d failures.", this.name, this.assertions, this.failures));
       }
-    };
+    }
+    return onEvent;
   };
 
   // Create and attach the logger event handler.
   // -------------------------------------------
-  testSuite.on("all", isBrowser ? createReport({
-    // Contains the aggregate suite results.
-    "results": "results",
-    // Contains the aggregate suite summary.
-    "summary": "stats",
-    // Displays the suite status.
-    "status": "status"
-  }) : createConsole(function (value) {
+  testSuite.on("all", isBrowser ? createReport("suite") : createConsole(function (value) {
     if (typeof console != "undefined" && console.log) {
       console.log(value);
     } else if (typeof print == "function" && !isBrowser) {
@@ -281,7 +321,7 @@
   // -----------------------
 
   testSuite.addTest("Spec.all", function (test) {
-    var result, languages = {
+    var languages = {
       "JavaScript": 1996,
       "Haskell": 1990,
       "Perl": 1987,
@@ -292,19 +332,8 @@
     // Returns the value of an object member.
     K = function K(key, value) {
       return value;
-    },
-
-    // A constructor function with direct and inherited properties that trigger
-    // the JScript `[[DontEnum]]` bug.
-    Class = function Class() {
-      // The `valueOf` and `toString` properties shadow properties on the
-      // prototype.
-      this.length = 1;
-      this.valueOf = 2;
-      this.toString = 3;
     };
 
-    // Basic tests.
     test.ok(Spec.all({}, K), "`all` should be vacuously true for an empty object");
     test.ok(Spec.all({
       "Kit": true,
@@ -323,6 +352,20 @@
       return key < "Visual Basic";
     }), "`all` should return `true` only if all members match the criteria specified by the callback");
 
+    test.done(5);
+  });
+
+  testSuite.addTest("Spec.forOwn", function (test) {
+    // A constructor function with direct and inherited properties that trigger
+    // the JScript `[[DontEnum]]` bug.
+    var Class = function Class() {
+      // The `valueOf` and `toString` properties shadow properties on the
+      // prototype.
+      this.length = 1;
+      this.valueOf = 2;
+      this.toString = 3;
+    }, result;
+
     // All prototype properties shadow corresponding `Object.prototype`
     // properties.
     Class.prototype = {
@@ -335,14 +378,14 @@
     };
 
     // Test callback function arguments.
-    Spec.all(new Class(), function (key, value, object) {
+    Spec.forOwn(new Class(), function (key, value, object) {
       test.equal(value, object[key], "The callback function should accept `key`, `value`, and `object` arguments");
-      return;
+      return false;
     });
 
     // Test enumeration of direct instance properties.
     result = 0;
-    Spec.all(new Class(), function (key, value) {
+    Spec.forOwn(new Class(), function (key, value) {
       result += 1;
       switch (key) {
         case "length":
@@ -358,13 +401,12 @@
           test.ok(false, substitute("Unexpected member. Property: %o. Value: %o.", key, value));
           return false;
       }
-      return true;
     });
     test.equal(result, 3, "The `Class` instance should contain three direct properties");
 
     // Test enumeration of direct prototype properties.
     result = 0;
-    Spec.all(Class.prototype, function (key, value) {
+    Spec.forOwn(Class.prototype, function (key, value) {
       result += 1;
       switch (key) {
         case "constructor":
@@ -381,17 +423,20 @@
           return test.equal(value, 9, "The direct `hasOwnProperty` prototype property should enumerated");
         default:
           test.ok(false, substitute("Unexpected member. Property: %o. Value: %o.", key, value));
+          return false;
       }
     });
     test.equal(result, 6, "The `Class` prototype should contain six direct properties");
 
-    // `Spec.all` normalizes the enumeration of the `prototype` property
+    // `Spec.forOwn` normalizes the enumeration of the `prototype` property
     // across environments.
-    test.ok(Spec.all(Class, function (key) {
-      return key != "prototype";
-    }), "The `prototype` property of a function should not be enumerated");
+    result = true;
+    Spec.forOwn(Class, function (key) {
+      return (result = key != "prototype");
+    });
+    test.ok(result, "The `prototype` property of a function should not be enumerated");
 
-    test.done(18);
+    test.done(13);
   });
 
   testSuite.addTest("Spec.equals", function () {
