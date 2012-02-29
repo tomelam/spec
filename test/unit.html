@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-<html lang=en>
+<html lang="en">
   <head>
-    <meta charset=utf-8>
+    <meta charset="utf-8">
     <title>Spec Unit Tests</title>
-    <link rel=stylesheet href=unit.css media=screen>
+    <link rel="stylesheet" href="unit.css" media="screen">
   </head>
   <body>
-    <h1 id=header>Spec Unit Tests</h1>
-    <div id=status></div>
-    <ol id=results></ol>
-    <p id=stats></p>
+    <div id="suite"></div>
     <script>var Lynt = {}, curl = { "apiName": "require" };</script>
-    <script src=vendor/maddy.js></script>
-    <script src=../lib/spec.js></script>
-    <script src=vendor/curl.js></script>
+    <script src="vendor/maddy.js"></script>
+    <script src="../lib/spec.js"></script>
+    <script src="vendor/curl.js"></script>
     <script>
     if (/[?&]async=false(?:&|$)/.test(this.location.search)) {
       this.require = this.define = null;
