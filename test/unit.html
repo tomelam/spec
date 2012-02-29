@@ -24,10 +24,7 @@
         this.require({
           // RequireJS accepts relative paths in the module name; `curl.js` does
           // not. Both accept a `paths` map of module paths to relative paths.
-          "paths": {
-            "spec": "../lib/spec",
-            "newton": "../lib/newton"
-          },
+          "paths": { "spec": "../lib/spec" },
           // Thwart aggressive resource caching. RequireJS only.
           "urlArgs": "async=" + (+new Date())
         }, ["spec", "unit"], function (Spec, testSuite) {
