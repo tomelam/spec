@@ -3,300 +3,36 @@
  * http://github.com/kitcambridge/spec
 */
 
-(function (global) {
+(function (root) {
   "use strict";
 
-  // Detect the current environment.
-  // -------------------------------
-
   // Detect asynchronous module loaders and CommonJS environments.
-  var isLoader = typeof define == "function" && typeof define["amd"] == "object" && define["amd"],
-  isEnvironment = typeof require == "function" && typeof exports == "object" && exports && !isLoader,
+  var isLoader = typeof define == "function" && !!define.amd,
+  isModule = typeof require == "function" && typeof exports == "object" && exports && !isLoader,
 
   // Weak object inferences for detecting browsers and JS engines.
-  isBrowser = "window" in global && global.window == global && typeof global.navigator != "undefined",
-  isEngine = !isBrowser && !isEnvironment && typeof global.load == "function",
+  isBrowser = "window" in root && root.window == root && typeof root.navigator != "undefined",
+  isEngine = !isBrowser && !isModule && typeof root.load == "function",
 
-  // Loads a module.
-  // ---------------
-  load = function load(module, path) {
-    return global[module] || (isEnvironment ? require(path) : isEngine ?
+  // Internal: Loads a module.
+  load = Newton.load = function load(module, path) {
+    return root[module] || (isModule ? require(path) : isEngine ?
       // Normalize the file extension.
-      (global.load(path.replace(/\.js$/, "") + ".js"), global[module]) : null);
+      (root.load(path.replace(/\.js$/, "") + ".js"), root[module]) : null);
   },
 
-  // Load Spec.
-  Spec = load("Spec", "../lib/spec"),
+  // Load Spec and the Newton utility library.
+  Spec = load("Spec", "../lib/spec"), Newton = load("Newton", "../lib/newton"),
 
-  // Load Maddy for serializing and inspecting objects.
-  Maddy = load("Maddy", "./vendor/maddy"),
-
-  // Convenience aliases. `undefined`, `NaN`, and `Infinity` are defined
-  // locally in case the global versions are overwritten.
-  // -------------------------------------------------------------------
-  getClass = {}.toString, undefined, NaN = 0 / 0, Infinity = 1 / 0,
-
-  // **clearElement** removes all child nodes from the given `element`.
-  clearElement = Spec.clearElement = function clearElement(element) {
-    while (element.firstChild) {
-      element.removeChild(element.firstChild);
-    }
-    return element;
-  },
-
-  // **buildNode** creates and returns a new element with the given `tagName`,
-  // DOM `properties`, and `children`.
-  buildNode = Spec.buildNode = (function () {
-    // Internal: Tests whether `document.createElement` supports the MSHTML
-    // extended syntax. This syntax is necessary for setting the `name` and
-    // `type` properties of elements, which are read-only in IE 7 and earlier.
-    var supportsExtendedElementSyntax = (function () {
-      try {
-        var element = document.createElement("<input name=a type=b>");
-        return element.name == "a" && element.type == "b";
-      } catch (exception) {
-        return false;
-      }
-    })();
-
-    // Internal: Returns an attribute string comprising the given attribute
-    // `name` and `value`.
-    function writeAttribute(name, value) {
-      return " " + name + "=\"" + value.replace(/"/g, "&quot;") + "\"";
-    }
-
-    // Expose the `buildNode` function.
-    function buildNode(tagName, properties, children) {
-      var hasProperties, element, property, length, value;
-      if (properties && getClass.call(properties) == "[object Array]") {
-        children = properties;
-        properties = null;
-      } else {
-        hasProperties = Object(properties) === properties;
-      }
-      // Set the read-only `name` and `type` properties in IE.
-      if (hasProperties && supportsExtendedElementSyntax) {
-        tagName = "<" + tagName;
-        if (Spec.hasKey(properties, "name")) {
-          tagName += writeAttribute("name", properties.name);
-          delete properties.name;
-        }
-        if (Spec.hasKey(properties, "type")) {
-          tagName += writeAttribute("type", properties.type);
-          delete properties.type;
-        }
-        tagName += ">";
-      }
-      element = document.createElement(tagName);
-      // Set the corresponding element and style properties.
-      if (hasProperties) {
-        if (Spec.hasKey(properties, "style")) {
-          Spec.forOwn(properties.style, function (property, value) {
-            element.style[property] = value;
-            return true;
-          });
-          delete properties.style;
-        }
-        Spec.forOwn(properties, function (property, value) {
-          element[property] = value;
-          return true;
-        });
-      }
-      // Append any child elements.
-      if (Object(children) === children) {
-        Spec.forEach(children, function (value) {
-          element.appendChild(value);
-        });
-      }
-      return element;
-    }
-    return buildNode;
-  })(),
+  // `undefined`, `NaN`, and `Infinity` are defined locally in case the global
+  // versions are overwritten.
+  undefined, NaN = 0 / 0, Infinity = 1 / 0,
 
   // Create the unit test suite.
-  // ---------------------------
-  testSuite = Spec.testSuite = new Spec.Suite("Spec Unit Tests"),
-
-  // Internal DOM event listener for the web logger; expands and collapses
-  // individual test results.
-  onClick = function onClick() {
-    // The event target is the list of messages.
-    var target = this.parentNode && this.parentNode.childNodes[1];
-    if (target) {
-      target.style.display = target.style.display == "none" ? "" : "none";
-    }
-  },
-
-  // **substitute** formats a string containing `sprintf`-style specifiers by
-  // successively interpolating the provided replacement arguments.
-  substitute = function substitute(value) {
-    var result, argument, index, length, symbol, directive;
-    value = String(value);
-    if (value.indexOf("%") < 0 || arguments.length < 2) {
-      return value;
-    }
-    for (result = "", argument = 1, index = 0, length = value.length; index < length; index += 1) {
-      symbol = value.charAt(index);
-      if (symbol == "%") {
-        directive = value.charAt(index + 1);
-        if (directive == "%") {
-          // Escape sequence; append a literal `%` character.
-          result += directive;
-        } else {
-          if (argument in arguments) {
-            // Format replacement arguments according to the directive.
-            switch (directive) {
-              // Floor integers. `NaN` is converted to `0`.
-              case "i":
-              case "d":
-                result += Math.floor(arguments[argument]) || 0;
-                break;
-              // Represent floating-point values as-is.
-              case "f":
-                result += +arguments[argument] || 0;
-                break;
-              // Serialize objects.
-              case "o":
-                result += Maddy.stringify(arguments[argument]);
-                break;
-              // Coerce all other values to strings.
-              default:
-                result += arguments[argument];
-            }
-          } else {
-            // No replacement argument; append the format specifier as-is.
-            result += symbol + directive;
-          }
-          // Use the next replacement argument for the subsequent interpolation.
-          argument += 1;
-        }
-        index += 1;
-      } else {
-        result += symbol;
-      }
-    }
-    return result;
-  },
-
-  // **createReport** creates a new QUnit-style web logger, returning an event
-  // handler that can be attached to a suite.
-  // -------------------------------------------------------------------------
-  createReport = Spec.createReport = function createReport(element) {
-    function onEvent(event) {
-      var type = event.type, target = event.target, messages, message;
-      if (getClass.call(element) == "[object String]") {
-        element = document.getElementById(element);
-      }
-      if (!element) {
-        throw TypeError(substitute("Invalid logger element: `%o`.", element));
-      }
-      switch (type) {
-        // Clear the previous test results and initialize the logger elements.
-        case "start":
-          // Clear the previous test results.
-          clearElement(element);
-          // Re-initialize the logger elements.
-          Spec.forOwn((this.elements = {
-            "header": buildNode("h1", { "id": "header" }, [document.createTextNode(this.name)]),
-            // Representing the status of the suite (e.g., running, passed, failed).
-            "status": buildNode("div", { "id": "status", "className": "running" }),
-            // Contains the aggregate suite results.
-            "results": buildNode("ol", { "id": "results" }),
-            // Contains the aggregate suite summary. (`summary`)
-            "stats": buildNode("p", { "id": "stats" }, [document.createTextNode("Running...")])
-          }), function (name, component) {
-            // Append each element to the top-level container.
-            element.appendChild(component);
-          });
-          break;
-        // Create a new element to display the results of the current test.
-        case "setup":
-          // Attach the internal event handler to the element.
-          this.elements.results.appendChild(buildNode("li", { "className": "running" }, [
-            buildNode("strong", { "onclick": onClick }, [document.createTextNode(target.name)])
-          ]));
-          break;
-        // Update the status of the current test.
-        case "teardown":
-          this.elements.results.childNodes[this.position].className = target.failures ? "fail" : "pass";
-          break;
-        // Update the suite status and cumulative summary.
-        case "complete":
-          // Set the spec status.
-          this.elements.status.className = target.failures ? "fail" : "pass";
-          // Create the aggregate spec summary.
-          clearElement(this.elements.stats).appendChild(document.createTextNode(substitute("%d assertions, %d failures.", target.assertions, target.failures)));
-          // Clean up.
-          delete this.elements;
-          break;
-        case "assertion":
-        case "failure":
-          // Create the message list if it doesn't already exist.
-          if (!(messages = this.elements.results.childNodes[this.position].childNodes[1])) {
-            // Hide the messages by default.
-            messages = buildNode("ol", { "style": { "display": "none" } });
-            this.elements.results.childNodes[this.position].appendChild(messages);
-          }
-          // Create a new message.
-          message = type == "assertion" ?
-            // `assertion` is fired when an assertion succeeds.
-            buildNode("li", { "className": "assertion" }, [
-              document.createTextNode(event.message)
-            ]) :
-            // `failure` is fired when an assertion fails.
-            buildNode("li", { "className": "failure" }, [
-              // Add the message to the list of messages.
-              document.createTextNode(event.message),
-              // Format and show the expected value.
-              buildNode("span", { "className": "expected" },
-                // Convert the expected value to JSON.
-                [document.createTextNode("Expected: "), buildNode("code", [
-                  document.createTextNode(Maddy.stringify(event.expected))
-                ])]),
-              // Format and show the actual value.
-              buildNode("span", { "className": "actual" },
-                // Convert the actual value to JSON.
-                [document.createTextNode("Actual: "), buildNode("code", [
-                  document.createTextNode(Maddy.stringify(event.actual))
-                ])])
-            ]);
-          // Show the message.
-          messages.appendChild(message);
-      }
-    }
-    return onEvent;
-  },
-
-  // **createConsole** creates a new console-based logger.
-  // -----------------------------------------------------
-  createConsole = Spec.createConsole = function createConsole(print) {
-    function onEvent(event) {
-      switch (event.type) {
-        case "start":
-          print(substitute("Started spec `%s`.", this.name));
-          break;
-        case "setup":
-          print(substitute("Started test `%s`.", event.target.name));
-          break;
-        case "assertion":
-          print(substitute("Assertion: %s.", event.message));
-          break;
-        case "failure":
-          print(substitute("Failure: %s. Expected: %o. Actual: %o.", event.message, event.expected, event.actual));
-          break;
-        case "teardown":
-          print(substitute("Finished test `%s`. %d assertions, %d failures.", event.target.name, event.target.assertions, event.target.failures));
-          break;
-        case "complete":
-          print(substitute("Finished spec `%s`. %d assertions, %d failures.", this.name, this.assertions, this.failures));
-      }
-    }
-    return onEvent;
-  };
+  testSuite = Spec.testSuite = new Spec.Suite("Spec Unit Tests");
 
   // Create and attach the logger event handler.
-  // -------------------------------------------
-  testSuite.on("all", isBrowser ? createReport("suite") : createConsole(function (value) {
+  testSuite.on("all", isBrowser ? Newton.createReport("suite") : Newton.createConsole(function (value) {
     if (typeof console != "undefined" && console.log) {
       console.log(value);
     } else if (typeof print == "function" && !isBrowser) {
@@ -307,20 +43,10 @@
     }
   }));
 
-  // Asynchronous module loading via RequireJS/`curl.js`.
-  // ----------------------------------------------------
-  if (isBrowser && isLoader && Spec.Environment.setTimeout) {
-    testSuite.addTest("Asynchronous Module Definition", function (test) {
-      setTimeout(function () {
-        test.equal(Lynt.version, Spec.version, "Spec should be exported as an asynchronous module").done(1);
-      }, 1500);
-    });
-  }
+  // Utility methods.
+  // ----------------
 
-  // Spec utility methods.
-  // -----------------------
-
-  testSuite.addTest("Spec.all", function (test) {
+  testSuite.addTest("Newton.all", function (test) {
     var languages = {
       "JavaScript": 1996,
       "Haskell": 1990,
@@ -334,21 +60,21 @@
       return value;
     };
 
-    test.ok(Spec.all({}, K), "`all` should be vacuously true for an empty object");
-    test.ok(Spec.all({
+    test.ok(Newton.all({}, K), "`all` should be vacuously true for an empty object");
+    test.ok(Newton.all({
       "Kit": true,
       "Maddy": true,
       "John-David": true
     }, K), "`all` should return `true` for an object containing all truthy values");
-    test.ok(!Spec.all({
+    test.ok(!Newton.all({
       "Kit": false,
       "Maddy": true,
       "John-David": true
     }, K), "`all` should return `false` for an object containing one or more falsy values");
-    test.ok(!Spec.all(languages, function (key, value) {
+    test.ok(!Newton.all(languages, function (key, value) {
       return key > "Delphi" && value > 1990;
     }), "`all` should return `false` if one or more members do not match the criteria specified by the callback");
-    test.ok(Spec.all(languages, function (key) {
+    test.ok(Newton.all(languages, function (key) {
       return key < "Visual Basic";
     }), "`all` should return `true` only if all members match the criteria specified by the callback");
 
@@ -398,7 +124,7 @@
           test.equal(value, 3, "The shadowed `toString` property should be enumerated once");
           break;
         default:
-          test.ok(false, substitute("Unexpected member. Property: %o. Value: %o.", key, value));
+          test.ok(false, Newton.substitute("Unexpected member. Property: %o. Value: %o.", key, value));
           return false;
       }
     });
@@ -422,7 +148,7 @@
         case "hasOwnProperty":
           return test.equal(value, 9, "The direct `hasOwnProperty` prototype property should enumerated");
         default:
-          test.ok(false, substitute("Unexpected member. Property: %o. Value: %o.", key, value));
+          test.ok(false, Newton.substitute("Unexpected member. Property: %o. Value: %o.", key, value));
           return false;
       }
     });
@@ -685,6 +411,7 @@
 
   // Custom events. Unit tests adapted from Backbone.
   // ------------------------------------------------
+
   testSuite.addTest("Events#on, emit", function (test) {
     var events = new Spec.Events();
 
@@ -736,7 +463,7 @@
           test.equal(event.message, "How quickly daft jumping zebras vex", "The messages passed to the `second` and `third` events should differ");
           break;
         default:
-          test.ok(false, substitute("Unexpected event fired: `%o`.", event));
+          test.ok(false, Newton.substitute("Unexpected event fired: `%o`.", event));
       }
     }).emit("first").emit({
       "type": "second",
@@ -763,7 +490,7 @@
       events.size += 1;
     }).emit("test").removeAllListeners("test").emit("test");
     this.equal(events.size, 1, "The `size` property should have only been incremented once, after which the event handler is removed");
-    this.ok(Maddy.isEmpty(events.events), "The event registry should be empty");
+    this.ok(Newton.isEmpty(events.events), "The event registry should be empty");
     this.done(2);
   });
 
@@ -790,7 +517,7 @@
     }
     events.on("test", callback).emit("test").emit("test").emit("test");
     this.equal(events.size, 1, "The `size` property should have only been incremented once");
-    this.ok(Maddy.isEmpty(events.events.event), "The event handler should have been removed");
+    this.ok(Newton.isEmpty(events.events.event), "The event handler should have been removed");
     this.done(2);
   });
 
@@ -1094,20 +821,14 @@
   });
 
   // Shuffle the tests to ensure that state leakage does not occur.
-  // --------------------------------------------------------------
   testSuite.shuffle();
 
-  // Run the tests.
-  // --------------
+  // Run or export the tests.
   if (isLoader) {
     define(function () {
       return testSuite;
     });
-  } else if (isBrowser) {
-    global.onload = function () {
-      testSuite.run();
-    };
-  } else if (!isEnvironment || (typeof module == "object" && module == require.main)) {
+  } else if (!isBrowser && (!isModule || (typeof module == "object" && module == require.main))) {
     testSuite.run();
   }
-}(this));
+})(this);
