@@ -308,7 +308,7 @@ environment inconsistencies.</p>
     <p>Manually invoke the callback for the <code>constructor</code> property due to
 cross-environment inconsistencies.</p>
     <pre>        <span class="k">if</span> <span class="p">(</span><span class="nx">isConstructor</span> <span class="o">||</span> <span class="nx">hasKey</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="s2">&quot;constructor&quot;</span><span class="p">))</span> <span class="p">{</span>
-          <span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="s2">&quot;constructor&quot;</span><span class="p">,</span> <span class="nx">object</span><span class="p">.</span><span class="nx">constructor</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span>
+          <span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="s2">&quot;constructor&quot;</span><span class="p">,</span> <span class="nx">object</span><span class="p">.</span><span class="nx">constructor</span><span class="p">,</span> <span class="nx">object</span><span class="p">);</span>
         <span class="p">}</span>
       <span class="p">};</span>
     <span class="p">}</span>
@@ -317,42 +317,30 @@ cross-environment inconsistencies.</p>
   </div>
   <div id="section-39" class="annotation">
     <a href="#section-39" class="section">&#167;</a>
-    <p><strong>all</strong> determines whether the callback returns <code>true</code> for all object
-members. This method is deprecated; use <strong>forOwn</strong> instead.</p>
-    <pre>  <span class="nx">all</span> <span class="o">=</span> <span class="nx">exports</span><span class="p">.</span><span class="nx">all</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">all</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="nx">forOwn</span><span class="p">(</span><span class="nx">object</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">result</span> <span class="o">=</span> <span class="o">!!</span><span class="nx">callback</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">object</span><span class="p">);</span>
-    <span class="p">});</span>
-    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-  <span class="p">},</span></pre>
-  </div>
-  <div id="section-40" class="annotation">
-    <a href="#section-40" class="section">&#167;</a>
     <p><strong>equals</strong> recursively compares two objects.</p>
     <pre>  <span class="nx">equals</span> <span class="o">=</span> <span class="nx">exports</span><span class="p">.</span><span class="nx">equals</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-41" class="annotation">
-    <a href="#section-41" class="section">&#167;</a>
+  <div id="section-40" class="annotation">
+    <a href="#section-40" class="section">&#167;</a>
     <p>Comparison algorithm derived from work by Jeremy Ashkenas and Philippe
 Rathe.</p>
     <pre>    <span class="kd">function</span> <span class="nx">eq</span><span class="p">(</span><span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">,</span> <span class="nx">stack</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">size</span><span class="p">,</span> <span class="nx">result</span><span class="p">;</span></pre>
   </div>
-  <div id="section-42" class="annotation">
-    <a href="#section-42" class="section">&#167;</a>
+  <div id="section-41" class="annotation">
+    <a href="#section-41" class="section">&#167;</a>
     <p>Identical objects are equivalent.</p>
     <pre>      <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">===</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-43" class="annotation">
-    <a href="#section-43" class="section">&#167;</a>
+  <div id="section-42" class="annotation">
+    <a href="#section-42" class="section">&#167;</a>
     <p><code>0</code> and <code>-0</code> are identical, but they aren&rsquo;t equivalent. See the
 ECMAScript Harmony <code>egal</code> proposal.</p>
     <pre>        <span class="k">return</span> <span class="nx">left</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="nx">left</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">/</span> <span class="nx">right</span><span class="p">);</span>
       <span class="p">}</span></pre>
   </div>
-  <div id="section-44" class="annotation">
-    <a href="#section-44" class="section">&#167;</a>
+  <div id="section-43" class="annotation">
+    <a href="#section-43" class="section">&#167;</a>
     <p><code>null</code> and <code>undefined</code> are compared by identity.</p>
     <pre>      <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">left</span> <span class="o">===</span> <span class="nx">right</span><span class="p">;</span>
@@ -363,8 +351,8 @@ ECMAScript Harmony <code>egal</code> proposal.</p>
       <span class="p">}</span>
       <span class="k">switch</span> <span class="p">(</span><span class="nx">className</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-45" class="annotation">
-    <a href="#section-45" class="section">&#167;</a>
+  <div id="section-44" class="annotation">
+    <a href="#section-44" class="section">&#167;</a>
     <p>Strings, numbers, dates, and booleans are compared by value.
 Primitives and their corresponding object wrappers are equivalent;
 thus, <code>"5"</code> is equivalent to <code>new String("5")</code>.</p>
@@ -374,14 +362,14 @@ thus, <code>"5"</code> is equivalent to <code>new String("5")</code>.</p>
           <span class="nx">left</span> <span class="o">=</span> <span class="o">+</span><span class="nx">left</span><span class="p">;</span>
           <span class="nx">right</span> <span class="o">=</span> <span class="o">+</span><span class="nx">right</span><span class="p">;</span></pre>
   </div>
-  <div id="section-46" class="annotation">
-    <a href="#section-46" class="section">&#167;</a>
+  <div id="section-45" class="annotation">
+    <a href="#section-45" class="section">&#167;</a>
     <p><code>NaN</code>s are equivalent, but non-reflexive. An <code>egal</code> comparison is
 performed for other numeric values.</p>
     <pre>          <span class="k">return</span> <span class="nx">left</span> <span class="o">!=</span> <span class="nx">left</span> <span class="o">?</span> <span class="nx">right</span> <span class="o">!=</span> <span class="nx">right</span> <span class="o">:</span> <span class="p">(</span><span class="nx">left</span> <span class="o">?</span> <span class="nx">left</span> <span class="o">==</span> <span class="nx">right</span> <span class="o">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="nx">left</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">/</span> <span class="nx">right</span><span class="p">));</span></pre>
   </div>
-  <div id="section-47" class="annotation">
-    <a href="#section-47" class="section">&#167;</a>
+  <div id="section-46" class="annotation">
+    <a href="#section-46" class="section">&#167;</a>
     <p>Coerce dates and booleans to numeric primitive values. Dates are
 compared by their millisecond representations; invalid dates are not
 equivalent.</p>
@@ -389,8 +377,8 @@ equivalent.</p>
         <span class="k">case</span> <span class="s2">&quot;[object Boolean]&quot;</span><span class="o">:</span>
           <span class="k">return</span> <span class="o">+</span><span class="nx">left</span> <span class="o">==</span> <span class="o">+</span><span class="nx">right</span><span class="p">;</span></pre>
   </div>
-  <div id="section-48" class="annotation">
-    <a href="#section-48" class="section">&#167;</a>
+  <div id="section-47" class="annotation">
+    <a href="#section-47" class="section">&#167;</a>
     <p>RegExps are compared by their source patterns, flags, and
 last-matched index.</p>
     <pre>        <span class="k">case</span> <span class="s2">&quot;[object RegExp]&quot;</span><span class="o">:</span>
@@ -404,8 +392,8 @@ last-matched index.</p>
         <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
       <span class="p">}</span></pre>
   </div>
-  <div id="section-49" class="annotation">
-    <a href="#section-49" class="section">&#167;</a>
+  <div id="section-48" class="annotation">
+    <a href="#section-48" class="section">&#167;</a>
     <p>Assume equality for cyclic structures. The algorithm for detecting
 cyclic structures is adapted from ES 5.1 section 15.12.3, abstract
 operation <code>JO</code>. This is a linear search; performance is inversely
@@ -416,31 +404,31 @@ proportional to the number of unique nested objects.</p>
         <span class="p">}</span>
       <span class="p">}</span></pre>
   </div>
-  <div id="section-50" class="annotation">
-    <a href="#section-50" class="section">&#167;</a>
+  <div id="section-49" class="annotation">
+    <a href="#section-49" class="section">&#167;</a>
     <p>Add the first object to the stack of traversed objects.</p>
     <pre>      <span class="nx">stack</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">left</span><span class="p">);</span>
       <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span></pre>
   </div>
-  <div id="section-51" class="annotation">
-    <a href="#section-51" class="section">&#167;</a>
+  <div id="section-50" class="annotation">
+    <a href="#section-50" class="section">&#167;</a>
     <p>Recursively compare objects and arrays.</p>
     <pre>      <span class="k">if</span> <span class="p">(</span><span class="nx">className</span> <span class="o">==</span> <span class="s2">&quot;[object Array]&quot;</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-52" class="annotation">
-    <a href="#section-52" class="section">&#167;</a>
+  <div id="section-51" class="annotation">
+    <a href="#section-51" class="section">&#167;</a>
     <p>Compare array lengths to determine if a deep comparison is necessary.</p>
     <pre>        <span class="nx">size</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
         <span class="nx">result</span> <span class="o">=</span> <span class="nx">size</span> <span class="o">==</span> <span class="nx">right</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-53" class="annotation">
-    <a href="#section-53" class="section">&#167;</a>
+  <div id="section-52" class="annotation">
+    <a href="#section-52" class="section">&#167;</a>
     <p>Deep compare the contents, ignoring non-numeric properties.</p>
     <pre>          <span class="k">while</span> <span class="p">(</span><span class="nx">size</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-54" class="annotation">
-    <a href="#section-54" class="section">&#167;</a>
+  <div id="section-53" class="annotation">
+    <a href="#section-53" class="section">&#167;</a>
     <p>Ensure commutative equality for sparse arrays.</p>
     <pre>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">result</span> <span class="o">=</span> <span class="p">(</span><span class="nx">size</span> <span class="k">in</span> <span class="nx">left</span> <span class="o">==</span> <span class="nx">size</span> <span class="k">in</span> <span class="nx">right</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">eq</span><span class="p">(</span><span class="nx">left</span><span class="p">[</span><span class="nx">size</span><span class="p">],</span> <span class="nx">right</span><span class="p">[</span><span class="nx">size</span><span class="p">],</span> <span class="nx">stack</span><span class="p">)))</span> <span class="p">{</span>
               <span class="k">break</span><span class="p">;</span>
@@ -450,25 +438,25 @@ proportional to the number of unique nested objects.</p>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
         <span class="nx">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></pre>
   </div>
-  <div id="section-55" class="annotation">
-    <a href="#section-55" class="section">&#167;</a>
+  <div id="section-54" class="annotation">
+    <a href="#section-54" class="section">&#167;</a>
     <p>Deep compare objects.</p>
     <pre>        <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
         <span class="nx">forOwn</span><span class="p">(</span><span class="nx">left</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-56" class="annotation">
-    <a href="#section-56" class="section">&#167;</a>
+  <div id="section-55" class="annotation">
+    <a href="#section-55" class="section">&#167;</a>
     <p>Count the expected number of properties.</p>
     <pre>          <span class="nx">size</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span></pre>
   </div>
-  <div id="section-57" class="annotation">
-    <a href="#section-57" class="section">&#167;</a>
+  <div id="section-56" class="annotation">
+    <a href="#section-56" class="section">&#167;</a>
     <p>Deep compare each own object member.</p>
     <pre>          <span class="k">return</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">hasKey</span><span class="p">(</span><span class="nx">right</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">eq</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">right</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">stack</span><span class="p">);</span>
         <span class="p">});</span></pre>
   </div>
-  <div id="section-58" class="annotation">
-    <a href="#section-58" class="section">&#167;</a>
+  <div id="section-57" class="annotation">
+    <a href="#section-57" class="section">&#167;</a>
     <p>Ensure that both objects contain the same number of properties.</p>
     <pre>        <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">forOwn</span><span class="p">(</span><span class="nx">right</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -480,21 +468,21 @@ proportional to the number of unique nested objects.</p>
         <span class="p">}</span>
       <span class="p">}</span></pre>
   </div>
-  <div id="section-59" class="annotation">
-    <a href="#section-59" class="section">&#167;</a>
+  <div id="section-58" class="annotation">
+    <a href="#section-58" class="section">&#167;</a>
     <p>Remove the first object from the stack of traversed objects.</p>
     <pre>      <span class="nx">stack</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
       <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
     <span class="p">}</span></pre>
   </div>
-  <div id="section-60" class="annotation">
-    <a href="#section-60" class="section">&#167;</a>
+  <div id="section-59" class="annotation">
+    <a href="#section-59" class="section">&#167;</a>
     <p>Define the top-level <code>equals</code> function.</p>
     <pre>    <span class="kd">function</span> <span class="nx">equals</span><span class="p">()</span> <span class="p">{</span>
       <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">length</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-61" class="annotation">
-    <a href="#section-61" class="section">&#167;</a>
+  <div id="section-60" class="annotation">
+    <a href="#section-60" class="section">&#167;</a>
     <p>Apply the comparison function left-to-right until all the provided
 arguments have been consumed.</p>
     <pre>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">eq</span><span class="p">(</span><span class="nx">arguments</span><span class="p">[</span><span class="nx">index</span><span class="p">],</span> <span class="nx">arguments</span><span class="p">[</span><span class="nx">index</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[]))</span> <span class="p">{</span>
@@ -507,8 +495,8 @@ arguments have been consumed.</p>
     <span class="k">return</span> <span class="nx">equals</span><span class="p">;</span>
   <span class="p">})(),</span></pre>
   </div>
-  <div id="section-62" class="annotation">
-    <a href="#section-62" class="section">&#167;</a>
+  <div id="section-61" class="annotation">
+    <a href="#section-61" class="section">&#167;</a>
     <p><strong>forEach</strong> iterates over a <code>list</code> of elements, yielding to a <code>callback</code>
 function on each iteration. If the <code>callback</code> explicitly returns <code>false</code>,
 the loop will terminate.</p>
@@ -525,20 +513,20 @@ the loop will terminate.</p>
     <span class="k">return</span> <span class="nx">list</span><span class="p">;</span>
   <span class="p">},</span></pre>
   </div>
-  <div id="section-63" class="annotation">
-    <a href="#section-63" class="section">&#167;</a>
+  <div id="section-62" class="annotation">
+    <a href="#section-62" class="section">&#167;</a>
     <p><strong>defer</strong> attempts to execute a callback function asynchronously in supported
 environments.</p>
     <pre>  <span class="nx">defer</span><span class="p">;</span></pre>
   </div>
-  <div id="section-64" class="annotation">
-    <a href="#section-64" class="section">&#167;</a>
+  <div id="section-63" class="annotation">
+    <a href="#section-63" class="section">&#167;</a>
     <p><code>process.nextTick</code> executes a function asynchronously in Node.</p>
     <pre>  <span class="k">if</span> <span class="p">(</span><span class="nx">Environment</span><span class="p">.</span><span class="nx">nextTick</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">defer</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">defer</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-65" class="annotation">
-    <a href="#section-65" class="section">&#167;</a>
+  <div id="section-64" class="annotation">
+    <a href="#section-64" class="section">&#167;</a>
     <p><code>process.nextTick</code> is an efficient alternative to <code>setTimeout(..., 0)</code>.
 As of Node 0.6.9, neither <code>process.nextTick</code> nor <code>setTimeout</code> isolate
 execution; if the <code>callback</code> throws an exception, subsequent deferred
@@ -551,8 +539,8 @@ and the Java <code>Timer</code> API exposed via LiveConnect in Rhino.</p>
       <span class="nx">process</span><span class="p">.</span><span class="nx">nextTick</span><span class="p">(</span><span class="nx">run</span><span class="p">);</span>
     <span class="p">};</span></pre>
   </div>
-  <div id="section-66" class="annotation">
-    <a href="#section-66" class="section">&#167;</a>
+  <div id="section-65" class="annotation">
+    <a href="#section-65" class="section">&#167;</a>
     <p>Browsers and Phantom provide the <code>setTimeout</code> function.</p>
     <pre>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">Environment</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">defer</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">defer</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
@@ -562,8 +550,8 @@ and the Java <code>Timer</code> API exposed via LiveConnect in Rhino.</p>
       <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">run</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
     <span class="p">};</span></pre>
   </div>
-  <div id="section-67" class="annotation">
-    <a href="#section-67" class="section">&#167;</a>
+  <div id="section-66" class="annotation">
+    <a href="#section-66" class="section">&#167;</a>
     <p>Mozilla Rhino&rsquo;s LiveConnect interface exposes the Java <code>Timer</code> API for
 executing tasks in a background thread.</p>
     <pre>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">Environment</span><span class="p">.</span><span class="nx">java</span><span class="p">)</span> <span class="p">{</span>
@@ -571,8 +559,8 @@ executing tasks in a background thread.</p>
       <span class="kd">var</span> <span class="nx">timer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">java</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Timer</span><span class="p">();</span>
       <span class="kd">function</span> <span class="nx">run</span><span class="p">()</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-68" class="annotation">
-    <a href="#section-68" class="section">&#167;</a>
+  <div id="section-67" class="annotation">
+    <a href="#section-67" class="section">&#167;</a>
     <p>Terminate the background thread once the task runs. If the thread
 is not terminated, the Rhino process will persist even after
 execution is completed.</p>
@@ -580,16 +568,16 @@ execution is completed.</p>
         <span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">);</span>
       <span class="p">}</span></pre>
   </div>
-  <div id="section-69" class="annotation">
-    <a href="#section-69" class="section">&#167;</a>
+  <div id="section-68" class="annotation">
+    <a href="#section-68" class="section">&#167;</a>
     <p>Schedule the timer task for background execution. A new scheduler is
 created for each task to ensure that exceptions do not leak between
 tasks.</p>
     <pre>      <span class="nx">timer</span><span class="p">.</span><span class="nx">schedule</span><span class="p">(</span><span class="k">new</span> <span class="nx">java</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">TimerTask</span><span class="p">(</span><span class="k">new</span> <span class="nx">java</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">Runnable</span><span class="p">({</span> <span class="s2">&quot;run&quot;</span><span class="o">:</span> <span class="nx">run</span> <span class="p">})),</span> <span class="mi">0</span><span class="p">);</span>
     <span class="p">};</span></pre>
   </div>
-  <div id="section-70" class="annotation">
-    <a href="#section-70" class="section">&#167;</a>
+  <div id="section-69" class="annotation">
+    <a href="#section-69" class="section">&#167;</a>
     <p>Execute the callback function synchronously in other environments.</p>
     <pre>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="nx">defer</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">defer</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
@@ -597,8 +585,8 @@ tasks.</p>
     <span class="p">};</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-71" class="annotation">
-    <a href="#section-71" class="section">&#167;</a>
+  <div id="section-70" class="annotation">
+    <a href="#section-70" class="section">&#167;</a>
     <p>Export the <code>defer</code> function.</p>
     <pre>  <span class="nx">exports</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="nx">defer</span><span class="p">;</span></pre>
   </div>
@@ -607,8 +595,8 @@ tasks.</p>
     <h2>Custom Events</h2>
     <pre></pre>
   </div>
-  <div id="section-73" class="annotation">
-    <a href="#section-73" class="section">&#167;</a>
+  <div id="section-72" class="annotation">
+    <a href="#section-72" class="section">&#167;</a>
     <p><code>Spec.Events</code> provides an interface for managing custom events. You can
 add and remove individual event handlers; triggering an event executes its
 handlers in succession. Based on work by Jeremy Ashkenas.</p>
@@ -617,8 +605,8 @@ handlers in succession. Based on work by Jeremy Ashkenas.</p>
     <span class="k">this</span><span class="p">.</span><span class="nx">events</span> <span class="o">=</span> <span class="p">{};</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-74" class="annotation">
-    <a href="#section-74" class="section">&#167;</a>
+  <div id="section-73" class="annotation">
+    <a href="#section-73" class="section">&#167;</a>
     <p><strong>addListener</strong> attaches a <code>callback</code> function to an <code>event</code>. The callback
 will be invoked whenever the event, specified by a string identifier, is
 fired. If the <code>event</code> contains spaces, it is treated as a list of multiple
@@ -632,14 +620,14 @@ invoked for <strong>all</strong> triggered events.</p>
         <span class="kd">var</span> <span class="nx">callbacks</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">],</span> <span class="nx">target</span> <span class="o">=</span> <span class="nx">callbacks</span> <span class="o">?</span> <span class="nx">callbacks</span><span class="p">.</span><span class="nx">previous</span> <span class="o">:</span> <span class="p">{},</span> <span class="nx">previous</span><span class="p">;</span>
         <span class="nx">target</span><span class="p">.</span><span class="nx">next</span> <span class="o">=</span> <span class="nx">previous</span> <span class="o">=</span> <span class="p">{};</span></pre>
   </div>
-  <div id="section-75" class="annotation">
-    <a href="#section-75" class="section">&#167;</a>
+  <div id="section-74" class="annotation">
+    <a href="#section-74" class="section">&#167;</a>
     <p>Store the event handler and context.</p>
     <pre>        <span class="nx">target</span><span class="p">.</span><span class="nx">callback</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
         <span class="nx">target</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span></pre>
   </div>
-  <div id="section-76" class="annotation">
-    <a href="#section-76" class="section">&#167;</a>
+  <div id="section-75" class="annotation">
+    <a href="#section-75" class="section">&#167;</a>
     <p>Create a new event target node.</p>
     <pre>        <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
           <span class="s2">&quot;previous&quot;</span><span class="o">:</span> <span class="nx">previous</span><span class="p">,</span>
@@ -650,8 +638,8 @@ invoked for <strong>all</strong> triggered events.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-77" class="annotation">
-    <a href="#section-77" class="section">&#167;</a>
+  <div id="section-76" class="annotation">
+    <a href="#section-76" class="section">&#167;</a>
     <p><strong>removeListener</strong> removes a previously-bound event handler. If the
 <code>context</code> is omitted, all versions of the handler, including those bound to
 different contexts, will be removed.</p>
@@ -662,8 +650,8 @@ different contexts, will be removed.</p>
         <span class="kd">var</span> <span class="nx">target</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">],</span> <span class="nx">previous</span><span class="p">;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-78" class="annotation">
-    <a href="#section-78" class="section">&#167;</a>
+  <div id="section-77" class="annotation">
+    <a href="#section-77" class="section">&#167;</a>
     <p>Create a new registry without the given event handler.</p>
     <pre>          <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">];</span>
           <span class="k">for</span> <span class="p">(</span><span class="nx">previous</span> <span class="o">=</span> <span class="nx">target</span><span class="p">.</span><span class="nx">previous</span><span class="p">;</span> <span class="p">(</span><span class="nx">target</span> <span class="o">=</span> <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">previous</span><span class="p">;)</span> <span class="p">{</span>
@@ -677,24 +665,24 @@ different contexts, will be removed.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-79" class="annotation">
-    <a href="#section-79" class="section">&#167;</a>
+  <div id="section-78" class="annotation">
+    <a href="#section-78" class="section">&#167;</a>
     <p><strong>removeAllListeners</strong> removes <em>all</em> registered handlers for an <code>event</code>,
 or all handlers for all events if the <code>event</code> is omitted.</p>
     <pre>  <span class="nx">Events</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">removeAllListeners</span> <span class="o">=</span> <span class="nx">removeAllListeners</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">removeAllListeners</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">event</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-80" class="annotation">
-    <a href="#section-80" class="section">&#167;</a>
+  <div id="section-79" class="annotation">
+    <a href="#section-79" class="section">&#167;</a>
     <p>Remove all event listeners.</p>
     <pre>      <span class="k">this</span><span class="p">.</span><span class="nx">events</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="nx">forEach</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">])</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-81" class="annotation">
-    <a href="#section-81" class="section">&#167;</a>
+  <div id="section-80" class="annotation">
+    <a href="#section-80" class="section">&#167;</a>
     <p>Remove the event listener registry.</p>
     <pre>          <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">];</span>
         <span class="p">}</span>
@@ -703,8 +691,8 @@ or all handlers for all events if the <code>event</code> is omitted.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-82" class="annotation">
-    <a href="#section-82" class="section">&#167;</a>
+  <div id="section-81" class="annotation">
+    <a href="#section-81" class="section">&#167;</a>
     <p><strong>once</strong> registers a one-time event handler for the specified <code>event</code>. The
 handler is invoked only the first time the <code>event</code> is triggered, after
 which it is removed. This method is deprecated.</p>
@@ -716,8 +704,8 @@ which it is removed. This method is deprecated.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">events</span><span class="p">,</span> <span class="nx">onEvent</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-83" class="annotation">
-    <a href="#section-83" class="section">&#167;</a>
+  <div id="section-82" class="annotation">
+    <a href="#section-82" class="section">&#167;</a>
     <p><strong>emit</strong> fires an event, specified by either a string identifier or an
 event object with a <code>type</code> property. Multiple event types are not
 supported for string identifiers.</p>
@@ -725,37 +713,37 @@ supported for string identifiers.</p>
   <span class="kd">function</span> <span class="nx">emit</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">previous</span><span class="p">,</span> <span class="nx">all</span><span class="p">,</span> <span class="nx">error</span><span class="p">;</span></pre>
   </div>
-  <div id="section-84" class="annotation">
-    <a href="#section-84" class="section">&#167;</a>
+  <div id="section-83" class="annotation">
+    <a href="#section-83" class="section">&#167;</a>
     <p>Convert a string identifier into an event object.</p>
     <pre>    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">event</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span> <span class="o">||</span> <span class="nx">getClass</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;[object String]&quot;</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">event</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="nx">event</span> <span class="p">};</span>
     <span class="p">}</span></pre>
   </div>
-  <div id="section-85" class="annotation">
-    <a href="#section-85" class="section">&#167;</a>
+  <div id="section-84" class="annotation">
+    <a href="#section-84" class="section">&#167;</a>
     <p>Capture a reference to the current event target.</p>
     <pre>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasKey</span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">))</span> <span class="p">{</span>
       <span class="nx">event</span><span class="p">.</span><span class="nx">target</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="p">}</span></pre>
   </div>
-  <div id="section-86" class="annotation">
-    <a href="#section-86" class="section">&#167;</a>
+  <div id="section-85" class="annotation">
+    <a href="#section-85" class="section">&#167;</a>
     <p>Capture a reference to the callback registry for the <code>all</code> event.</p>
     <pre>    <span class="nx">all</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">type</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">all</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">((</span><span class="nx">target</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">events</span><span class="p">[</span><span class="nx">event</span><span class="p">.</span><span class="nx">type</span><span class="p">]))</span> <span class="p">{</span>
       <span class="k">for</span> <span class="p">(</span><span class="nx">previous</span> <span class="o">=</span> <span class="nx">target</span><span class="p">.</span><span class="nx">previous</span><span class="p">;</span> <span class="p">(</span><span class="nx">target</span> <span class="o">=</span> <span class="nx">target</span><span class="p">.</span><span class="nx">next</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">previous</span><span class="p">;)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-87" class="annotation">
-    <a href="#section-87" class="section">&#167;</a>
+  <div id="section-86" class="annotation">
+    <a href="#section-86" class="section">&#167;</a>
     <p>Execute the callbacks in succession.</p>
     <pre>        <span class="k">try</span> <span class="p">{</span>
           <span class="nx">call</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">target</span><span class="p">.</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">target</span><span class="p">.</span><span class="nx">context</span> <span class="o">||</span> <span class="k">this</span><span class="p">,</span> <span class="nx">event</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">exception</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">error</span> <span class="o">=</span> <span class="nx">exception</span><span class="p">;</span></pre>
   </div>
-  <div id="section-88" class="annotation">
-    <a href="#section-88" class="section">&#167;</a>
+  <div id="section-87" class="annotation">
+    <a href="#section-87" class="section">&#167;</a>
     <p>Re-throw exceptions asynchronously, allowing all subsequent
 callbacks to fire.</p>
     <pre>          <span class="nx">defer</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -765,8 +753,8 @@ callbacks to fire.</p>
       <span class="p">}</span>
     <span class="p">}</span></pre>
   </div>
-  <div id="section-89" class="annotation">
-    <a href="#section-89" class="section">&#167;</a>
+  <div id="section-88" class="annotation">
+    <a href="#section-88" class="section">&#167;</a>
     <p>Fire the <code>all</code> event.</p>
     <pre>    <span class="k">if</span> <span class="p">(</span><span class="nx">all</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">for</span> <span class="p">(</span><span class="nx">previous</span> <span class="o">=</span> <span class="nx">all</span><span class="p">.</span><span class="nx">previous</span><span class="p">;</span> <span class="p">(</span><span class="nx">all</span> <span class="o">=</span> <span class="nx">all</span><span class="p">.</span><span class="nx">next</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">previous</span><span class="p">;)</span> <span class="p">{</span>
@@ -788,15 +776,15 @@ callbacks to fire.</p>
     <h2>Suites</h2>
     <pre></pre>
   </div>
-  <div id="section-91" class="annotation">
-    <a href="#section-91" class="section">&#167;</a>
+  <div id="section-90" class="annotation">
+    <a href="#section-90" class="section">&#167;</a>
     <p>Suites are event-driven collections of unit tests. Using custom events, you
 can create routines for setting up and tearing down tests, handling
 assertions and failures, and logging test results.</p>
     <pre>  <span class="nx">exports</span><span class="p">.</span><span class="nx">Suite</span> <span class="o">=</span> <span class="nx">Suite</span><span class="p">;</span></pre>
   </div>
-  <div id="section-92" class="annotation">
-    <a href="#section-92" class="section">&#167;</a>
+  <div id="section-91" class="annotation">
+    <a href="#section-91" class="section">&#167;</a>
     <p>Creates a new suite with an optional <code>name</code>.</p>
     <pre>  <span class="kd">function</span> <span class="nx">Suite</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">Events</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
@@ -806,19 +794,19 @@ assertions and failures, and logging test results.</p>
     <span class="k">this</span><span class="p">.</span><span class="nx">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-93" class="annotation">
-    <a href="#section-93" class="section">&#167;</a>
+  <div id="section-92" class="annotation">
+    <a href="#section-92" class="section">&#167;</a>
     <p>The default suite name.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Anonymous Suite&quot;</span><span class="p">;</span></pre>
   </div>
-  <div id="section-94" class="annotation">
-    <a href="#section-94" class="section">&#167;</a>
+  <div id="section-93" class="annotation">
+    <a href="#section-93" class="section">&#167;</a>
     <p>Add support for custom events.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Events</span><span class="p">();</span>
   <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">Suite</span><span class="p">;</span></pre>
   </div>
-  <div id="section-95" class="annotation">
-    <a href="#section-95" class="section">&#167;</a>
+  <div id="section-94" class="annotation">
+    <a href="#section-94" class="section">&#167;</a>
     <p>Extend the <code>Suite</code> prototype with generic array methods.</p>
     <pre>  <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">prototype</span><span class="p">,</span> <span class="nx">methods</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">method</span><span class="p">;</span> <span class="nx">method</span> <span class="o">=</span> <span class="nx">methods</span><span class="p">[</span><span class="nx">index</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">];)</span> <span class="p">{</span>
@@ -826,8 +814,8 @@ assertions and failures, and logging test results.</p>
     <span class="p">}</span>
   <span class="p">})(</span><span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;join&quot;</span><span class="p">,</span> <span class="s2">&quot;pop&quot;</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">,</span> <span class="s2">&quot;reverse&quot;</span><span class="p">,</span> <span class="s2">&quot;shift&quot;</span><span class="p">,</span> <span class="s2">&quot;sort&quot;</span><span class="p">,</span> <span class="s2">&quot;splice&quot;</span><span class="p">,</span> <span class="s2">&quot;unshift&quot;</span><span class="p">]);</span></pre>
   </div>
-  <div id="section-96" class="annotation">
-    <a href="#section-96" class="section">&#167;</a>
+  <div id="section-95" class="annotation">
+    <a href="#section-95" class="section">&#167;</a>
     <p>Shuffles the suite using a Fisher-Yates shuffle.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">shuffle</span> <span class="o">=</span> <span class="nx">shuffle</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">shuffle</span><span class="p">()</span> <span class="p">{</span>
@@ -840,8 +828,8 @@ assertions and failures, and logging test results.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-97" class="annotation">
-    <a href="#section-97" class="section">&#167;</a>
+  <div id="section-96" class="annotation">
+    <a href="#section-96" class="section">&#167;</a>
     <p>Adds a test to the suite. The test name is optional.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addTest</span> <span class="o">=</span> <span class="nx">addTest</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">addTest</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">test</span><span class="p">)</span> <span class="p">{</span>
@@ -849,14 +837,17 @@ assertions and failures, and logging test results.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-98" class="annotation">
-    <a href="#section-98" class="section">&#167;</a>
+  <div id="section-97" class="annotation">
+    <a href="#section-97" class="section">&#167;</a>
     <p>Returns the index of the next available test relative to the given
 <code>position</code>, or <code>null</code> if no additional tests are available.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">index</span> <span class="o">=</span> <span class="nx">index</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">index</span><span class="p">(</span><span class="nx">position</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">length</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">test</span><span class="p">;</span>
-    <span class="nx">position</span> <span class="o">=</span> <span class="nx">position</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nx">length</span> <span class="o">+</span> <span class="nx">position</span> <span class="o">:</span> <span class="p">(</span><span class="nx">position</span> <span class="o">||</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="nx">position</span> <span class="o">||</span> <span class="p">(</span><span class="nx">position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">position</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">position</span> <span class="o">=</span> <span class="nx">length</span> <span class="o">+</span> <span class="nx">position</span><span class="p">;</span>
+    <span class="p">}</span>
     <span class="k">for</span> <span class="p">(;</span> <span class="nx">position</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span> <span class="nx">position</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">test</span> <span class="o">=</span> <span class="nx">position</span> <span class="k">in</span> <span class="k">this</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">[</span><span class="nx">position</span><span class="p">];</span>
       <span class="k">if</span> <span class="p">(</span><span class="nx">test</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">test</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">test</span> <span class="k">instanceof</span> <span class="nx">Test</span><span class="p">)</span> <span class="p">{</span>
@@ -866,8 +857,8 @@ assertions and failures, and logging test results.</p>
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-99" class="annotation">
-    <a href="#section-99" class="section">&#167;</a>
+  <div id="section-98" class="annotation">
+    <a href="#section-98" class="section">&#167;</a>
     <p>An event handler invoked each time a test in the suite emits an event.
 This event handler updates the suite summary and prepares to run the next
 test.</p>
@@ -875,14 +866,14 @@ test.</p>
   <span class="kd">function</span> <span class="nx">onSuiteEvent</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">target</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span></pre>
   </div>
-  <div id="section-100" class="annotation">
-    <a href="#section-100" class="section">&#167;</a>
+  <div id="section-99" class="annotation">
+    <a href="#section-99" class="section">&#167;</a>
     <p>Proxy the fired event.</p>
     <pre>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">event</span><span class="p">);</span>
     <span class="k">switch</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-101" class="annotation">
-    <a href="#section-101" class="section">&#167;</a>
+  <div id="section-100" class="annotation">
+    <a href="#section-100" class="section">&#167;</a>
     <p>Update the suite summary.</p>
     <pre>      <span class="k">case</span> <span class="s2">&quot;assertion&quot;</span><span class="o">:</span>
         <span class="k">this</span><span class="p">.</span><span class="nx">assertions</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
@@ -892,58 +883,58 @@ test.</p>
         <span class="k">break</span><span class="p">;</span>
       <span class="k">case</span> <span class="s2">&quot;teardown&quot;</span><span class="o">:</span></pre>
   </div>
-  <div id="section-102" class="annotation">
-    <a href="#section-102" class="section">&#167;</a>
+  <div id="section-101" class="annotation">
+    <a href="#section-101" class="section">&#167;</a>
     <p>Unbind the internal event handler.</p>
     <pre>        <span class="nx">target</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onEvent</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">((</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">index</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">))</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
           <span class="nx">target</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span><span class="p">];</span></pre>
   </div>
-  <div id="section-103" class="annotation">
-    <a href="#section-103" class="section">&#167;</a>
+  <div id="section-102" class="annotation">
+    <a href="#section-102" class="section">&#167;</a>
     <p>Run the next test.</p>
     <pre>          <span class="nx">defer</span><span class="p">(</span><span class="nx">target</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onEvent</span><span class="p">,</span> <span class="k">this</span><span class="p">).</span><span class="nx">run</span><span class="p">,</span> <span class="nx">target</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-104" class="annotation">
-    <a href="#section-104" class="section">&#167;</a>
+  <div id="section-103" class="annotation">
+    <a href="#section-103" class="section">&#167;</a>
     <p>Finish running the suite.</p>
     <pre>          <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;complete&quot;</span><span class="p">);</span>
         <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-105" class="annotation">
-    <a href="#section-105" class="section">&#167;</a>
+  <div id="section-104" class="annotation">
+    <a href="#section-104" class="section">&#167;</a>
     <p>Runs the suite.</p>
     <pre>  <span class="nx">Suite</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">run</span> <span class="o">=</span> <span class="nx">runSuite</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">runSuite</span><span class="p">()</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-106" class="annotation">
-    <a href="#section-106" class="section">&#167;</a>
+  <div id="section-105" class="annotation">
+    <a href="#section-105" class="section">&#167;</a>
     <p>Create the spec summary.</p>
     <pre>    <span class="kd">var</span> <span class="nx">target</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">position</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">assertions</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">failures</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></pre>
   </div>
-  <div id="section-107" class="annotation">
-    <a href="#section-107" class="section">&#167;</a>
+  <div id="section-106" class="annotation">
+    <a href="#section-106" class="section">&#167;</a>
     <p>Begin running the suite.</p>
     <pre>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">);</span></pre>
   </div>
-  <div id="section-108" class="annotation">
-    <a href="#section-108" class="section">&#167;</a>
+  <div id="section-107" class="annotation">
+    <a href="#section-107" class="section">&#167;</a>
     <p>Bind the internal event handler to the first test.</p>
     <pre>    <span class="k">if</span> <span class="p">((</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">index</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span><span class="p">))</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">target</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">position</span><span class="p">];</span></pre>
   </div>
-  <div id="section-109" class="annotation">
-    <a href="#section-109" class="section">&#167;</a>
+  <div id="section-108" class="annotation">
+    <a href="#section-108" class="section">&#167;</a>
     <p>Run the first test.</p>
     <pre>      <span class="nx">defer</span><span class="p">(</span><span class="nx">target</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onEvent</span><span class="p">,</span> <span class="k">this</span><span class="p">).</span><span class="nx">run</span><span class="p">,</span> <span class="nx">target</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></pre>
   </div>
-  <div id="section-110" class="annotation">
-    <a href="#section-110" class="section">&#167;</a>
+  <div id="section-109" class="annotation">
+    <a href="#section-109" class="section">&#167;</a>
     <p>Finish running the suite.</p>
     <pre>      <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;complete&quot;</span><span class="p">);</span>
     <span class="p">}</span>
@@ -955,8 +946,8 @@ test.</p>
     <h2>Tests</h2>
     <pre></pre>
   </div>
-  <div id="section-112" class="annotation">
-    <a href="#section-112" class="section">&#167;</a>
+  <div id="section-111" class="annotation">
+    <a href="#section-111" class="section">&#167;</a>
     <p>Wraps a test function with convenience methods and assertions.</p>
     <pre>  <span class="nx">exports</span><span class="p">.</span><span class="nx">Test</span> <span class="o">=</span> <span class="nx">Test</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">Test</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">test</span><span class="p">)</span> <span class="p">{</span>
@@ -970,25 +961,25 @@ test.</p>
     <span class="p">}</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">test</span> <span class="o">=</span> <span class="nx">test</span><span class="p">;</span></pre>
   </div>
-  <div id="section-113" class="annotation">
-    <a href="#section-113" class="section">&#167;</a>
+  <div id="section-112" class="annotation">
+    <a href="#section-112" class="section">&#167;</a>
     <p>Bind the helper event handler.</p>
     <pre>    <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onEvent</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-114" class="annotation">
-    <a href="#section-114" class="section">&#167;</a>
+  <div id="section-113" class="annotation">
+    <a href="#section-113" class="section">&#167;</a>
     <p>Add support for custom events.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Events</span><span class="p">();</span>
   <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">Test</span><span class="p">;</span></pre>
   </div>
-  <div id="section-115" class="annotation">
-    <a href="#section-115" class="section">&#167;</a>
+  <div id="section-114" class="annotation">
+    <a href="#section-114" class="section">&#167;</a>
     <p>The default test name.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;Anonymous Test&quot;</span><span class="p">;</span></pre>
   </div>
-  <div id="section-116" class="annotation">
-    <a href="#section-116" class="section">&#167;</a>
+  <div id="section-115" class="annotation">
+    <a href="#section-115" class="section">&#167;</a>
     <p>An event handler invoked each time a test emits an event.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">onEvent</span> <span class="o">=</span> <span class="nx">onTestEvent</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">onTestEvent</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
@@ -1006,8 +997,8 @@ test.</p>
       <span class="k">case</span> <span class="s2">&quot;teardown&quot;</span><span class="o">:</span>
         <span class="nx">expected</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">expected</span><span class="p">;</span></pre>
   </div>
-  <div id="section-117" class="annotation">
-    <a href="#section-117" class="section">&#167;</a>
+  <div id="section-116" class="annotation">
+    <a href="#section-116" class="section">&#167;</a>
     <p>Verify that the expected number of assertions were executed.</p>
     <pre>        <span class="k">if</span> <span class="p">((</span><span class="k">typeof</span> <span class="nx">expected</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="o">||</span> <span class="nx">getClass</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">expected</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;[object Number]&quot;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">expected</span> <span class="o">!=</span> <span class="k">this</span><span class="p">.</span><span class="nx">assertions</span><span class="p">)</span> <span class="p">{</span>
           <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">({</span>
@@ -1020,8 +1011,8 @@ test.</p>
     <span class="p">}</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-118" class="annotation">
-    <a href="#section-118" class="section">&#167;</a>
+  <div id="section-117" class="annotation">
+    <a href="#section-117" class="section">&#167;</a>
     <p><strong>assert</strong> creates a new assertion method with the given <code>name</code>. If the
 provided <code>callback</code> function returns a falsy value, the assertion fails.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">assert</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">;</span>
@@ -1036,22 +1027,22 @@ provided <code>callback</code> function returns a falsy value, the assertion fai
     <span class="k">return</span> <span class="nx">assertion</span><span class="p">;</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-119" class="annotation">
-    <a href="#section-119" class="section">&#167;</a>
+  <div id="section-118" class="annotation">
+    <a href="#section-118" class="section">&#167;</a>
     <p>Runs the test.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">run</span> <span class="o">=</span> <span class="nx">runTest</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">runTest</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s2">&quot;setup&quot;</span><span class="p">);</span></pre>
   </div>
-  <div id="section-120" class="annotation">
-    <a href="#section-120" class="section">&#167;</a>
+  <div id="section-119" class="annotation">
+    <a href="#section-119" class="section">&#167;</a>
     <p>Pass the wrapper as the first argument to the test function.</p>
     <pre>    <span class="k">this</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-121" class="annotation">
-    <a href="#section-121" class="section">&#167;</a>
+  <div id="section-120" class="annotation">
+    <a href="#section-120" class="section">&#167;</a>
     <p><strong>ok</strong> tests whether an <code>expression</code> is truthy. The optional <code>message</code>
 defaults to the name of the current assertion (e.g., <code>ok</code>).</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">ok</span> <span class="o">=</span> <span class="nx">ok</span><span class="p">;</span>
@@ -1064,23 +1055,23 @@ defaults to the name of the current assertion (e.g., <code>ok</code>).</p>
       <span class="p">};</span>
     <span class="p">}</span></pre>
   </div>
-  <div id="section-122" class="annotation">
-    <a href="#section-122" class="section">&#167;</a>
+  <div id="section-121" class="annotation">
+    <a href="#section-121" class="section">&#167;</a>
     <p>Note: To test for the boolean <code>true</code>, use the <code>strictEqual</code> assertion.</p>
     <pre>    <span class="nx">event</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="nx">expression</span> <span class="o">?</span> <span class="s2">&quot;assertion&quot;</span> <span class="o">:</span> <span class="s2">&quot;failure&quot;</span><span class="p">;</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">event</span><span class="p">);</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-123" class="annotation">
-    <a href="#section-123" class="section">&#167;</a>
+  <div id="section-122" class="annotation">
+    <a href="#section-122" class="section">&#167;</a>
     <p><strong>notOk</strong> tests whether an <code>expression</code> is falsy.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">notOk</span> <span class="o">=</span> <span class="nx">notOk</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">notOk</span><span class="p">(</span><span class="nx">expression</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="o">!</span><span class="nx">expression</span><span class="p">,</span> <span class="nx">message</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="s2">&quot;notOk&quot;</span> <span class="o">:</span> <span class="nx">message</span><span class="p">);</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-124" class="annotation">
-    <a href="#section-124" class="section">&#167;</a>
+  <div id="section-123" class="annotation">
+    <a href="#section-123" class="section">&#167;</a>
     <p><strong>equal</strong> tests whether <code>actual</code> is <strong>equal</strong> to <code>expected</code>, as determined
 by the <code>==</code> operator.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">equal</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="nx">assertEqual</span><span class="p">);</span>
@@ -1088,53 +1079,53 @@ by the <code>==</code> operator.</p>
     <span class="k">return</span> <span class="nx">actual</span> <span class="o">==</span> <span class="nx">expected</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-125" class="annotation">
-    <a href="#section-125" class="section">&#167;</a>
+  <div id="section-124" class="annotation">
+    <a href="#section-124" class="section">&#167;</a>
     <p><strong>notEqual</strong> tests for <strong>loose</strong> or coercive inequality.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">notEqual</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;notEqual&quot;</span><span class="p">,</span> <span class="nx">assertNotEqual</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">assertNotEqual</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">expected</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">actual</span> <span class="o">!=</span> <span class="nx">expected</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-126" class="annotation">
-    <a href="#section-126" class="section">&#167;</a>
+  <div id="section-125" class="annotation">
+    <a href="#section-125" class="section">&#167;</a>
     <p><strong>strictEqual</strong> tests for <strong>strict</strong> equality (<code>actual === expected</code>).</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">strictEqual</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;strictEqual&quot;</span><span class="p">,</span> <span class="nx">assertStrictEqual</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">assertStrictEqual</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">expected</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">actual</span> <span class="o">===</span> <span class="nx">expected</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-127" class="annotation">
-    <a href="#section-127" class="section">&#167;</a>
+  <div id="section-126" class="annotation">
+    <a href="#section-126" class="section">&#167;</a>
     <p><strong>notStrictEqual</strong> tests for strict inequality.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">notStrictEqual</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;notStrictEqual&quot;</span><span class="p">,</span> <span class="nx">assertStrictNotEqual</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">assertStrictNotEqual</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">expected</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">actual</span> <span class="o">!==</span> <span class="nx">expected</span><span class="p">;</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-128" class="annotation">
-    <a href="#section-128" class="section">&#167;</a>
+  <div id="section-127" class="annotation">
+    <a href="#section-127" class="section">&#167;</a>
     <p><strong>deepEqual</strong> tests for deep equality and equivalence, as determined by the
 <code>Spec.equals</code> function.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">deepEqual</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;deepEqual&quot;</span><span class="p">,</span> <span class="nx">equals</span><span class="p">);</span></pre>
   </div>
-  <div id="section-129" class="annotation">
-    <a href="#section-129" class="section">&#167;</a>
+  <div id="section-128" class="annotation">
+    <a href="#section-128" class="section">&#167;</a>
     <p><strong>notDeepEqual</strong> tests for deep inequality.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">notDeepEqual</span> <span class="o">=</span> <span class="nx">assert</span><span class="p">(</span><span class="s2">&quot;notDeepEqual&quot;</span><span class="p">,</span> <span class="nx">assertNotDeepEqual</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">assertNotDeepEqual</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">expected</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="o">!</span><span class="nx">equals</span><span class="p">(</span><span class="nx">actual</span><span class="p">,</span> <span class="nx">expected</span><span class="p">);</span>
   <span class="p">}</span></pre>
   </div>
-  <div id="section-130" class="annotation">
-    <a href="#section-130" class="section">&#167;</a>
+  <div id="section-129" class="annotation">
+    <a href="#section-129" class="section">&#167;</a>
     <p>Ensures that the <code>callback</code> function throws an exception.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="nx">assertError</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">assertError</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">expected</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">ok</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">isRegExp</span> <span class="o">=</span> <span class="nx">expected</span> <span class="o">&amp;&amp;</span> <span class="nx">getClass</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">expected</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;[object RegExp]&quot;</span><span class="p">,</span> <span class="nx">isFunction</span> <span class="o">=</span> <span class="o">!</span><span class="nx">isRegExp</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">expected</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span><span class="p">;</span></pre>
   </div>
-  <div id="section-131" class="annotation">
-    <a href="#section-131" class="section">&#167;</a>
+  <div id="section-130" class="annotation">
+    <a href="#section-130" class="section">&#167;</a>
     <p>Invalid expected value; the message was passed as the second argument.</p>
     <pre>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isFunction</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">isRegExp</span> <span class="o">&amp;&amp;</span> <span class="nx">message</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">message</span> <span class="o">=</span> <span class="nx">expected</span><span class="p">;</span>
@@ -1148,8 +1139,8 @@ by the <code>==</code> operator.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">message</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="s2">&quot;error&quot;</span> <span class="o">:</span> <span class="nx">message</span><span class="p">);</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-132" class="annotation">
-    <a href="#section-132" class="section">&#167;</a>
+  <div id="section-131" class="annotation">
+    <a href="#section-131" class="section">&#167;</a>
     <p>Ensures that the <code>callback</code> function does not throw any exceptions.</p>
     <pre>  <span class="nx">Test</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">noError</span> <span class="o">=</span> <span class="nx">assertNoError</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">assertNoError</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
@@ -1162,8 +1153,8 @@ by the <code>==</code> operator.</p>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="nx">ok</span><span class="p">,</span> <span class="nx">message</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="s2">&quot;noError&quot;</span> <span class="o">:</span> <span class="nx">message</span><span class="p">);</span>
   <span class="p">};</span></pre>
   </div>
-  <div id="section-133" class="annotation">
-    <a href="#section-133" class="section">&#167;</a>
+  <div id="section-132" class="annotation">
+    <a href="#section-132" class="section">&#167;</a>
     <p><strong>done</strong> completes a test with an optional number of expected <code>assertions</code>.
 This method <strong>must</strong> be called at the end of each test.</p>
 
@@ -1174,6 +1165,7 @@ This method <strong>must</strong> be called at the end of each test.</p>
       <span class="s2">&quot;expected&quot;</span><span class="o">:</span> <span class="nx">assertions</span>
     <span class="p">});</span>
   <span class="p">};</span>
+  <span class="k">return</span> <span class="nx">exports</span><span class="p">;</span>
 <span class="p">});</span></pre>
   </div>
 </body>

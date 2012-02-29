@@ -15,7 +15,7 @@
   isEngine = !isBrowser && !isModule && typeof root.load == "function",
 
   // Internal: Loads a module.
-  load = Newton.load = function load(module, path) {
+  load = function load(module, path) {
     return root[module] || (isModule ? require(path) : isEngine ?
       // Normalize the file extension.
       (root.load(path.replace(/\.js$/, "") + ".js"), root[module]) : null);
@@ -45,41 +45,6 @@
 
   // Utility methods.
   // ----------------
-
-  testSuite.addTest("Newton.all", function (test) {
-    var languages = {
-      "JavaScript": 1996,
-      "Haskell": 1990,
-      "Perl": 1987,
-      "Python": 1991,
-      "Ruby": 1993
-    },
-
-    // Returns the value of an object member.
-    K = function K(key, value) {
-      return value;
-    };
-
-    test.ok(Newton.all({}, K), "`all` should be vacuously true for an empty object");
-    test.ok(Newton.all({
-      "Kit": true,
-      "Maddy": true,
-      "John-David": true
-    }, K), "`all` should return `true` for an object containing all truthy values");
-    test.ok(!Newton.all({
-      "Kit": false,
-      "Maddy": true,
-      "John-David": true
-    }, K), "`all` should return `false` for an object containing one or more falsy values");
-    test.ok(!Newton.all(languages, function (key, value) {
-      return key > "Delphi" && value > 1990;
-    }), "`all` should return `false` if one or more members do not match the criteria specified by the callback");
-    test.ok(Newton.all(languages, function (key) {
-      return key < "Visual Basic";
-    }), "`all` should return `true` only if all members match the criteria specified by the callback");
-
-    test.done(5);
-  });
 
   testSuite.addTest("Spec.forOwn", function (test) {
     // A constructor function with direct and inherited properties that trigger
