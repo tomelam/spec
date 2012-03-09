@@ -37,7 +37,7 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 ### JavaScript Engines
 
 - Mozilla [SpiderMonkey](http://www.mozilla.org/js/spidermonkey), version 1.5.0 and higher
-- Mozilla [Rhino](http://www.mozilla.org/rhino) 1.7R1 and higher
+- Mozilla [Rhino](http://www.mozilla.org/rhino) 1.6R3 and higher
 - WebKit [JSC](https://trac.webkit.org/wiki/JSC)
 - Google [V8](http://code.google.com/p/v8)
 
