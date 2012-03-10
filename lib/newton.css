@@ -1,5 +1,5 @@
 /*!
- * QUnit Styles for Spec
+ * QUnit Styles for Newton
  * http://github.com/jquery/unit
  *
  * Based on work by Ben Alman.
@@ -10,7 +10,7 @@ body {
   font: 13px 'Helvetica Neue Light', 'HelveticaNeue-Light', 'Helvetica Neue', Calibri, Helvetica, Arial;
 }
 
-p, ol, #status {
+p, ol, .suiteStatus {
   margin: 0;
   padding: 0;
 }
@@ -37,53 +37,62 @@ li {
   list-style-position: inside;
 }
 
-p, #results li.running, #results li.pass {
+p, .testRunning, .testPassed {
   color: #913D00;
   background-color: #FDEBDC;
 }
 
-#results li ol, #header, #stats {
-  border-radius: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
+.testFailed {
+  background-color: #f99;
+  color: #000;
 }
 
-#header {
+.assertionList, .suiteHeader, .suiteSummary {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.suiteHeader {
   color: #fff;
   background-color: #FF7F00;
   margin: 0;
   padding: 0.5em 1em;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+  font-size: 24px;
   -webkit-border-bottom-right-radius: 0;
   -webkit-border-bottom-left-radius: 0;
   -moz-border-radius-bottomright: 0;
   -moz-border-radius-bottomleft: 0;
-  font-size: 24px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
-#status {
+.suiteStatus {
   height: 5px;
 }
 
-#status.running {
+.suiteRunning {
   background-color: #913D00;
 }
 
-#status.pass {
+.suitePassed {
   background-color: #0a0;
 }
 
-#status.fail, #status.error {
+.suiteFailed {
   background-color: #f99;
 }
 
-#results li {
+.testBlock {
   padding: 0.4em 2.5em;
   border-bottom: 1px solid #fff;
 }
 
-#results li ol {
+.testName {
+  cursor: pointer;
+}
+
+.assertionList {
   margin-top: 0.5em;
   padding: 0.5em;
   background-color: #fff;
@@ -92,7 +101,7 @@ p, #results li.running, #results li.pass {
   box-shadow: inset 0px 1px 8px #ccc;
 }
 
-#results li ol li {
+.assertionPassed, .assertionFailed {
   border-bottom: none;
   margin: 0.5em;
   background-color: #fff;
@@ -100,45 +109,36 @@ p, #results li.running, #results li.pass {
   padding: 0.4em 0.5em;
 }
 
-#results li ol li.assertion {
+.assertionPassed {
   border-left: 26px solid #0a0;
   background-color: #fff;
   color: #0a0;
 }
 
-#results li ol li.failure, #results li ol li.error {
+.assertionFailed {
   border-left: 26px solid #f00;
   background-color: #fff;
   color: #f00;
 }
 
-#results li.fail, #results li.error {
-  background-color: #f99;
-  color: #000;
-}
-
-#results li ol li span {
+.failureActual, .failureExpected {
   display: block;
   font-weight: bold;
 }
 
-#results li ol li span code {
-  font-weight: normal;
-}
-
-#results li.fail li span.actual, #results li.error li span.actual {
+.failureActual {
   color: #EE5757;
 }
 
-#results li.fail li span.expected {
+.failureExpected {
   color: green;
 }
 
-#results li strong {
-  cursor: pointer;
+.jsonValue {
+  font-weight: normal;
 }
 
-#stats {
+.suiteSummary {
   margin: 0;
   color: #913D00;
   background-color: #FDEBDC;
