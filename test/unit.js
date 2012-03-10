@@ -744,7 +744,6 @@
       };
     }
 
-    this.error(create(SyntaxError), /SyntaxError/, "A RegExp may be used to validate the thrown exception");
     this.error(create(TypeError), function (exception, context) {
       test.equal(this, context, "The context of the callback function should be equivalent to the value of the `context` argument");
       test.equal(context, test, "The value of the `context` argument should be the current test");
@@ -770,7 +769,9 @@
     // RegExp doesn't match the thrown exception.
     expected = 0;
     new Spec.Test(function () {
-      this.error(create(TypeError), /SyntaxError/);
+      this.error(create(TypeError), function (exception) {
+        return exception.name == "SyntaxError";
+      });
       this.error(create(Error), function (exception) {
         return exception.message == "Ack!";
       });
@@ -782,7 +783,7 @@
     }).run();
     this.equal(expected, 2, "Two `failure` events should have been fired");
 
-    this.done(9);
+    this.done(8);
   });
 
   // Shuffle the tests to ensure that state leakage does not occur.
