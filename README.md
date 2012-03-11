@@ -22,11 +22,13 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 ### Web Browsers
 
 - Windows [Internet Explorer](http://www.microsoft.com/windows/internet-explorer), version 6.0 and higher
-- Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.5 and higher
+- Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.0 and higher
 - Apple [Safari](http://www.apple.com/safari), version 2.0 and higher
 - Google [Chrome](http://www.google.com/chrome), version 1.0 and higher
 - [Opera](http://www.opera.com) 7.02 and higher
-- [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
+- [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.0, [Netscape](http://browser.netscape.com/releases) 6.2.3, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
+
+**Note**: One unit test currently fails in Opera 7.02. This is due to an implementation bug in the JavaScript engine: dates with invalid time values (e.g., `new Date("Kit")`) are normalized to represent the current date.
 
 ### CommonJS Environments
 
