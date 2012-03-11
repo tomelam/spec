@@ -25,7 +25,7 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 - Mozilla [Firefox](http://www.mozilla.com/firefox), version 1.5 and higher
 - Apple [Safari](http://www.apple.com/safari), version 2.0 and higher
 - Google [Chrome](http://www.google.com/chrome), version 1.0 and higher
-- [Opera](http://www.opera.com) 7.54 and higher
+- [Opera](http://www.opera.com) 7.02 and higher
 - [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.7.2, [Netscape](http://browser.netscape.com/releases) 7.2, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
 
 ### CommonJS Environments
@@ -37,7 +37,7 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 ### JavaScript Engines
 
 - Mozilla [SpiderMonkey](http://www.mozilla.org/js/spidermonkey), version 1.5.0 and higher
-- Mozilla [Rhino](http://www.mozilla.org/rhino) 1.6R3 and higher
+- Mozilla [Rhino](http://www.mozilla.org/rhino) 1.5R5 and higher
 - WebKit [JSC](https://trac.webkit.org/wiki/JSC)
 - Google [V8](http://code.google.com/p/v8)
 
