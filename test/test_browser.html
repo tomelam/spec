@@ -16,7 +16,7 @@
       var Lynt = this.Spec || {};
       if (/[?&]async=false(?:&|$)/.test(this.location.search)) {
         this.require = this.define = null;
-        document.write('<script src="unit.js"><\/script>');
+        document.write('<script src="test_spec.js"><\/script>');
         this.onload = function () {
           Lynt.testSuite.run();
         };
@@ -27,7 +27,7 @@
           "paths": { "spec": "../lib/spec" },
           // Thwart aggressive resource caching. RequireJS only.
           "urlArgs": "async=" + (+new Date())
-        }, ["spec", "unit"], function (Spec, testSuite) {
+        }, ["spec", "test_spec"], function (Spec, testSuite) {
           // Test asynchronous module loading via RequireJS/`curl.js`.
           testSuite.addTest("Asynchronous Module Definition", function (test) {
             setTimeout(function () {

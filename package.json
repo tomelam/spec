@@ -21,7 +21,7 @@
     "url": "http://github.com/kitcambridge/spec/issues"
   },
   "scripts": {
-    "test": "node test/unit.js"
+    "test": "node test/test_spec.js"
   },
   "repository": {
     "type": "git",
