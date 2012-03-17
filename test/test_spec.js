@@ -131,7 +131,7 @@
   });
 
   testSuite.addTest("Spec.equals", function () {
-    var left, right, expected = 94, First = function First() {
+    var left, right, expected = 93, First = function First() {
       this.toString = 1;
     }, Second = function Second() {
       this.toString = 1;
@@ -203,7 +203,14 @@
     this.notOk(Spec.equals(new Date(1993, 5, 2), { "getTime": function () { return 7390008e5; } }), "Date objects and objects with a `getTime` method should not be equal");
     this.notOk(Spec.equals(new Date(1993, 5, 2), { "toString": function () { return 7390008e5; } }), "Date objects and objects with a `toString` method should not be equal");
     this.notOk(Spec.equals(new Date(1993, 5, 2), { "valueOf": function () { return 7390008e5; } }), "Date objects and objects with a `valueOf` method should not be equal");
-    this.notOk(Spec.equals(new Date("Maddy"), new Date("Maddy")), "Invalid dates should not be equal");
+
+    // Opera 7 normalizes dates with invalid time values to represent the
+    // current date.
+    left = new Date("Maddy");
+    if (!isFinite(left)) {
+      expected += 1;
+      this.notOk(Spec.equals(left, new Date("Maddy")), "Invalid dates should not be equal");
+    }
 
     // Functions.
     this.notOk(Spec.equals(First, Second), "Different functions with identical bodies and source code representations should not be equal");

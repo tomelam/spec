@@ -28,8 +28,6 @@ Spec has been **tested** with the following web browsers, CommonJS environments,
 - [Opera](http://www.opera.com) 7.02 and higher
 - [Mozilla](http://www.mozilla.org/projects/browsers.html) 1.0, [Netscape](http://browser.netscape.com/releases) 6.2.3, and [SeaMonkey](http://www.seamonkey-project.org/) 1.0 and higher
 
-**Note**: One unit test currently fails in Opera 7.02. This is due to an implementation bug in the JavaScript engine: dates with invalid time values (e.g., `new Date("Kit")`) are normalized to represent the current date.
-
 ### CommonJS Environments
 
 - Node 0.2.6 and higher
