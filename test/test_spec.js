@@ -43,6 +43,60 @@
     }
   }));
 
+  testSuite.addTest("Newton.serializeQuery", function () {
+    var parameters = { "stuff[]": ["$", "a", ";"] };
+
+    this.strictEqual(Newton.serializeQuery({}), "", "Empty object");
+    this.strictEqual(Newton.serializeQuery({ "key": [] }), "", "Empty array value");
+    this.strictEqual(Newton.serializeQuery({ "foo": {}, "bar": {} }), "", "Unrecognized values should be omitted");
+
+    this.equal(Newton.serializeQuery(Newton.parseQuery("a=b")), "a=b", "`serializeQuery` is the inverse of `parseQuery`");
+    this.deepEqual(Newton.parseQuery(Newton.serializeQuery(parameters)), parameters, "`parseQuery` is the inverse of `serializeQuery`");
+
+    this.equal(Newton.serializeQuery({ "key#": "value" }), "key%23=value", "Parameter containing a URI control character");
+    this.equal(Newton.serializeQuery({ "key": "value#" }), "key=value%23", "Value containing a URI control character");
+    this.equal(Newton.serializeQuery({ "key": undefined }), "key", "`undefined` value");
+    this.equal(Newton.serializeQuery({ "key": null }), "key", "`null` value");
+    this.equal(Newton.serializeQuery({ "key": 0 }), "key=0", "Numeric value");
+    this.equal(Newton.serializeQuery({ "key": true }), "key=true", "Boolean value");
+
+    this.equal(Newton.serializeQuery({ "color": ["r", "g", "b"] }), "color=r&color=g&color=b", "Array value containing string elements");
+    this.equal(Newton.serializeQuery({ "key": [null, undefined] }), "key&key", "Array value containing `null` and `undefined` elements");
+    this.equal(Newton.serializeQuery({ "color": ["r", null, "g", undefined, 0] }), "color=r&color&color=g&color&color=0", "Array value containing various elements");
+
+    this.equal(Newton.serializeQuery(parameters), "stuff%5B%5D=%24&stuff%5B%5D=a&stuff%5B%5D=%3B", "Parameter and array elements containing URI control characters");
+    this.equal(Newton.serializeQuery({ "toString": "value", "valueOf": null }), "toString=value&valueOf", "Shadowed property names should be permitted as parameters");
+
+    this.done(16);
+  });
+
+  testSuite.addTest("Newton.parseQuery", function () {
+    var result = { "a": null, "b": "c" }, message = "Parameter collection containing empty values";
+
+    this.deepEqual(Newton.parseQuery(""), {}, "Empty query string");
+    this.deepEqual(Newton.parseQuery("foo?"), {}, "Empty query string as part of a URL");
+    this.deepEqual(Newton.parseQuery("foo?a&b=c"), result, "Query string as part of a URL");
+    this.deepEqual(Newton.parseQuery("foo?a&b=c#fragment"), result, "Query string with URL and fragment");
+    this.deepEqual(Newton.parseQuery("a;b=c", ";"), result, "Custom `separator` argument");
+
+    this.deepEqual(Newton.parseQuery("a"), { "a": null }, "Parameter without a value");
+    this.deepEqual(Newton.parseQuery("a=b&=c"), { "a": "b" }, "Value without a parameter");
+    this.deepEqual(Newton.parseQuery("a=b&c="), { "a": "b", "c": "" }, "Empty value");
+
+    this.deepEqual(Newton.parseQuery(Newton.serializeQuery(Newton.parseQuery("a=b&c"))), { "a": "b", "c": null }, "cross-convert containing an undefined value");
+    this.deepEqual(Newton.parseQuery("a%20b=c&d=e%20f&g=h"), { "a b": "c", "d": "e f", "g": "h" }, "Keys and values should be properly decoded");
+    this.deepEqual(Newton.parseQuery("a=b=c=d"), { "a": "b=c=d" }, "Value containing multiple `=` characters");
+    this.deepEqual(Newton.parseQuery("&a=b&&&c=d"), { "a": "b", "c": "d" }, "Consecutive `&` separators should be ignored");
+    this.deepEqual(Newton.parseQuery("col=r&col=g&col=b"), { "col": ["r", "g", "b"] }, "Identical parameter values should be aggregated into an array");
+    this.deepEqual(Newton.parseQuery("toString=value&valueOf"), { "toString": "value", "valueOf": null }, "Shadowed property names should be permitted as parameters");
+
+    this.deepEqual(Newton.parseQuery("c=r&c=&c=b"), { "c": ["r", "", "b"] }, message);
+    this.deepEqual(Newton.parseQuery("c=&c=blue"), { "c": ["", "blue"] }, message);
+    this.deepEqual(Newton.parseQuery("c=blue&c="), { "c": ["blue", ""] }, message);
+
+    this.done(17);
+  });
+
   // Utility methods.
   // ----------------
 

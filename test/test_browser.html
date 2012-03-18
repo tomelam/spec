@@ -10,7 +10,6 @@
     <script src="../lib/spec.js"></script>
     <script src="../lib/newton.js"></script>
     <script>
-    // 
     (function () {
       var Spec = this.Spec, Newton = this.Newton, parameters;
       if (!Spec || !Newton) {
@@ -21,7 +20,7 @@
         // Load RequireJS or `curl.js`. `document.write` is used because older
         // versions of Safari and Chrome do not support DOM script injection.
         this.curl = { "apiName": "require" };
-        document.write('<script src="vendor/' + (parameters.amd == "require" ? "require" : "curl") + '.js"><\/script>');
+        this.document.write('<script src="vendor/' + (parameters.amd == "require" ? "require" : "curl") + '.js"><\/script>');
       }
     }).call(this);
     </script>
@@ -45,7 +44,7 @@
           testSuite.run();
         });
       } else {
-        document.write('<script src="test_spec.js"><\/script>');
+        this.document.write('<script src="test_spec.js"><\/script>');
         this.onload = function () {
           Lynt.testSuite.run();
         };
